@@ -2,12 +2,12 @@ var handler = async (m, { conn, text, command }) => {
   let action, successMsg, errorMsg, helpMsg;
   if (['promote', 'promuovi', 'p'].includes(command)) {
     action = 'promote';
-    successMsg = `@&{sender.split('@')[0]}`;
+    successMsg = `@${sender.split('@')[0]} 𝐡𝐚 𝐝𝐚𝐭𝐨 𝐢 𝐩𝐨𝐭𝐞𝐫𝐢 𝐚 @${promotedUser.split('@')[0]}`;
     errorMsg = `『 ❌ 』 \`Errore nel promuovere l'utente.\``;
     helpMsg = `『 👤 』 \`A chi vuoi dare amministratore?\``;
   } else if (['demote', 'retrocedi', 'r'].includes(command)) {
     action = 'demote';
-    successMsg = `『 ✅ 』 \`È stato retrocesso dal ruolo di amministratore.\``;
+    successMsg = `@${sender.split('@')[0]} 𝐡𝐚 𝐭𝐨𝐥𝐭𝐨 𝐢 𝐩𝐨𝐭𝐞𝐫𝐢 𝐚 @${demotedUser.split('@')[0]} 𝐨𝐫𝐚 𝐩𝐢𝐚𝐧𝐠𝐢`;
     errorMsg = `『 ❌ 』 \`Errore nel retrocedere l'utente.\``;
     helpMsg = `『 👤 』 \`A chi vuoi togliere amministratore?\``;
   } else {
