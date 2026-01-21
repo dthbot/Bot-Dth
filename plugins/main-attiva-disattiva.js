@@ -1,191 +1,174 @@
-import fetch from 'node-fetch';
+let handler = async (m, { conn, command, args, isAdmin, isOwner, isROwner }) => {
 
-let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isROwner }) => {
-  const userName = m.pushName || 'Utente';
+  const isEnable = /attiva|enable|on|1/i.test(command)
+  const chats = global.db.data.chats
+  const settings = global.db.data.settings
 
-  let userProfilePicBuffer;
-  try {
-    const profilePicUrl = await conn.profilePictureUrl(m.sender, 'image');
-    userProfilePicBuffer = await (await fetch(profilePicUrl)).arrayBuffer();
-  } catch {
-    userProfilePicBuffer = Buffer.from([]);
+  chats[m.chat] ??= {}
+  settings[conn.user.jid] ??= {}
+
+  const chat = chats[m.chat]
+  const bot = settings[conn.user.jid]
+
+  /* ====== HELPER GRAFICO ====== */
+  const box = (title, lines) =>
+`╭─〔 ${title} 〕─╮
+${lines.map(l => `│ ${l}`).join('\n')}
+╰──────────────╯`
+
+  const noAdmin = box('❌ ACCESSO NEGATO', ['Solo admin del gruppo'])
+  const noOwner = box('👑 SOLO OWNER', ['Funzione riservata'])
+
+  if (!args[0]) {
+    throw box('ℹ️ UTILIZZO', [
+      '.attiva <funzione>',
+      '.disattiva <funzione>',
+      '',
+      'Funzioni:',
+      'antilink, antigore',
+      'antiporno, modoadmin',
+      'benvenuto, addio',
+      'antiprivato, antibot',
+      'antispam'
+    ])
   }
 
-  let dynamicContextInfo = {
-    externalAdReply: {
-      title: "ᴅᴛʜ-ʙᴏᴛ",
-      body: "Sistema avanzato di gestione",
-      mediaType: 1,
-      jpegThumbnail: userProfilePicBuffer.length ? userProfilePicBuffer : null
-    }
-  };
+  let feature = args[0].toLowerCase()
+  let result = ''
 
-  let isEnable = /true|enable|attiva|(turn)?on|1/i.test(command);
-  if (/disable|disattiva|off|0/i.test(command)) isEnable = false;
+  switch (feature) {
 
-  global.db.data.chats[m.chat] ??= {};
-  global.db.data.users[m.sender] ??= {};
-  let chat = global.db.data.chats[m.chat];
-  let bot = global.db.data.settings[conn.user.jid] || {};
+/* ====== ANTILINK ====== */
+    case 'antilink':
+      if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin)
+      if (chat.antiLink === isEnable)
+        return m.reply(box('🔗 ANTILINK', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
 
-  /* ================= MENU ================= */
-  if (!args.length) {
-    const message = {
-      text:
-`╭〔 ⚙️ *FUNZIONI* ⚙️ 〕╮
-│
-│ 👋 *Benvenuto ${userName}*
-│
-│ Da questo pannello puoi:
-│ • Attivare funzioni
-│ • Disattivare funzioni
-│ • Gestire il gruppo
-│
-│ 💡 Usa il menu qui sotto
-│    per selezionare l’azione
-│
-╰───────────────────╯`,
-      footer: '˗ˏˋ ☾ 𝚟𝚊𝚛𝚎𝚋𝚘𝚝 ☽ ˎˊ˗',
-      contextInfo: dynamicContextInfo
-    };
+      chat.antiLink = isEnable
+      result = box('🔗 ANTILINK', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Blocca link WhatsApp'
+      ])
+      break
 
-    return conn.sendMessage(m.chat, message);
+    /* ====== ANTIGORE ====== */
+    case 'antigore':
+      if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin)
+      if (chat.antigore === isEnable)
+        return m.reply(box('🚫 ANTIGORE', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      chat.antigore = isEnable
+      result = box('🚫 ANTIGORE', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Blocca contenuti violenti'
+      ])
+      break
+
+    /* ====== ANTIPORNO ====== */
+    case 'antiporno':
+    case 'antiporn':
+      if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin)
+      if (chat.antiporno === isEnable)
+        return m.reply(box('🔞 ANTIPORNO', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      chat.antiporno = isEnable
+      result = box('🔞 ANTIPORNO', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Blocca contenuti NSFW'
+      ])
+      break
+
+/* ====== SOLOADMIN ====== */
+    case 'modoadmin':
+    case 'soloadmin':
+      if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin)
+      if (chat.modoadmin === isEnable)
+        return m.reply(box('🛡️ SOLO ADMIN', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      chat.modoadmin = isEnable
+      result = box('🛡️ SOLO ADMIN', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Solo admin usano comandi'
+      ])
+      break
+
+    /* ====== BENVENUTO ====== */
+    case 'benvenuto':
+    case 'welcome':
+      if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin)
+      if (chat.welcome === isEnable)
+        return m.reply(box('👋 BENVENUTO', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      chat.welcome = isEnable
+      result = box('👋 BENVENUTO', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Messaggio di ingresso'
+      ])
+      break
+
+    /* ====== ADDIO ====== */
+    case 'addio':
+    case 'goodbye':
+      if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin)
+      if (chat.goodbye === isEnable)
+        return m.reply(box('🚪 ADDIO', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      chat.goodbye = isEnable
+      result = box('🚪 ADDIO', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Messaggio di uscita'
+      ])
+      break
+
+    /* ====== ANTIPRIVATO ====== */
+    case 'antiprivato':
+      if (!isOwner && !isROwner) return m.reply(noOwner)
+      if (bot.antiprivato === isEnable)
+        return m.reply(box('🔒 ANTIPRIVATO', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      bot.antiprivato = isEnable
+      result = box('🔒 ANTIPRIVATO', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Blocca messaggi privati'
+      ])
+      break
+
+/* ====== ANTIBOT ====== */
+    case 'antibot':
+      if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin)
+      if (chat.antiBot === isEnable)
+        return m.reply(box('🤖 ANTIBOT', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      chat.antiBot = isEnable
+      result = box('🤖 ANTIBOT', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Blocca bot esterni'
+      ])
+      break
+
+    /* ====== ANTISPAM ====== */
+    case 'antispam':
+      if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin)
+      if (chat.antispam === isEnable)
+        return m.reply(box('🛑 ANTISPAM', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      chat.antispam = isEnable
+      result = box('🛑 ANTISPAM', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Protezione spam/flood'
+      ])
+      break
+
+    default:
+      return m.reply(box('❓ FUNZIONE', ['Funzione non riconosciuta']))
   }
 
-  /* ================= RISULTATI ================= */
-  let results = [];
+  return m.reply(result)
+}
 
-  for (let type of args.map(a => a.toLowerCase())) {
-    let result = { type, status: '' };
+handler.help = ['attiva', 'disattiva']
+handler.tags = ['group']
+handler.command = ['attiva', 'disattiva', 'enable', 'disable', 'on', 'off']
+handler.group = false
 
-    const already = isEnable ? 'già attiva' : 'già disattiva';
-    const enabled = isEnable ? '🟢 *ATTIVATA*' : '🔴 *DISATTIVATA*';
-
-    const adminOnly =
-`╭〔 ❌ *ACCESSO NEGATO* ❌ 〕╮
-│
-│ Questo comando è riservato
-│ agli *ADMIN DEL GRUPPO*
-│
-╰──────────────────────╯`;
-
-    const ownerOnly =
-`╭〔 👑 *SOLO OWNER* 👑 〕╮
-│
-│ Questa funzione è riservata
-│ esclusivamente al creatore
-│ del bot
-│
-╰───────────────────╯`;
-
-    switch (type) {
-
-      case 'welcome':
-        if (!isAdmin && !isOwner && !isROwner) {
-          result.status = adminOnly; break;
-        }
-        if (chat.welcome === isEnable) {
-          result.status = `⚠️ Funzione ${already}`; break;
-        }
-        chat.welcome = isEnable;
-        result.status =
-`╭〔 👋 *WELCOME* 👋 〕╮
-│ Stato: ${enabled}
-│
-│ Il bot ora gestirà
-│ i messaggi di benvenuto
-╰──────────────────╯`;
-        break;
-
-      case 'goodbye':
-        if (!isAdmin && !isOwner && !isROwner) {
-          result.status = adminOnly; break;
-        }
-        chat.goodbye = isEnable;
-        result.status =
-`╭─〔 🚪 *ADDIO* 🚪 〕─╮
-│ Stato: ${enabled}
-│
-│ Messaggi di uscita
-│ configurati correttamente
-╰────────────────╯`;
-        break;
-
-      case 'antiprivato':
-        if (!isOwner && !isROwner) {
-          result.status = ownerOnly; break;
-        }
-        bot.antiprivato = isEnable;
-        result.status =
-`╭─〔 🔒 *ANTIPRIVATO* 🔒 〕─╮
-│ Stato: ${enabled}
-│
-│ Il bot non accetterà
-│ messaggi in privato
-╰───────────────────╯`;
-        break;
-
-      case 'antibot':
-        if (!isAdmin && !isOwner && !isROwner) {
-          result.status = adminOnly; break;
-        }
-        chat.antiBot = isEnable;
-        result.status =
-`╭〔 🤖 *ANTIBOT* 🤖 〕╮
-│ Stato: ${enabled}
-│
-│ Bot indesiderati
-│ verranno rimossi
-╰──────────────────╯`;
-        break;
-
-      case 'antilink':
-        if (!isAdmin && !isOwner && !isROwner) {
-          result.status = adminOnly; break;
-        }
-        chat.antiLink = isEnable;
-        result.status =
-`╭〔 🔗 *ANTILINK* 🔗 〕╮
-│ Stato: ${enabled}
-│
-│ I link non consentiti
-│ verranno bloccati
-╰────────────────╯`;
-        break;
-
-      default:
-        result.status =
-`╭─〔 ❓ *COMANDO* ❓ 〕╮
-│
-│ La funzione "${type}"
-│ non è riconosciuta
-│
-╰───────────────────╯`;
-        break;
-    }
-
-    results.push(result);
-  }
-
-  /* ================= RIEPILOGO ================= */
-  let summary =
-` ╭〔 📋 *RIEPILOGO* 📋 〕╮
-│`;
-
-  for (let r of results) {
-    summary += `\n│ 🔹 ${r.type}\n│ ${r.status.replace(/\n/g, '\n│ ')}`;
-  }
-
-  summary += `\n╰────────────────╯`;
-
-  await conn.sendMessage(m.chat, {
-    text: summary,
-    contextInfo: dynamicContextInfo
-  });
-};
-
-handler.help = ['attiva', 'disattiva'];
-handler.tags = ['main'];
-handler.command = ['enable', 'disable', 'attiva', 'disattiva', 'on', 'off'];
-
-export default handler;
+export default handler
