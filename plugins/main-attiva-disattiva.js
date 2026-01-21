@@ -13,7 +13,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
 
   let dynamicContextInfo = {
     externalAdReply: {
-      title: "𝚅𝙰𝚁𝙴𝙱𝙾𝚃",
+      title: "ᴅᴛʜ-ʙᴏᴛ",
       body: "Sistema avanzato di gestione",
       mediaType: 1,
       jpegThumbnail: userProfilePicBuffer.length ? userProfilePicBuffer : null
@@ -32,7 +32,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
   if (!args.length) {
     const message = {
       text:
-`╭────〔 ⚙️ *GESTIONE FUNZIONI* ⚙️ 〕────╮
+`╭〔 ⚙️ *FUNZIONI* ⚙️ 〕╮
 │
 │ 👋 *Benvenuto ${userName}*
 │
@@ -44,7 +44,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
 │ 💡 Usa il menu qui sotto
 │    per selezionare l’azione
 │
-╰──────────────────────────╯`,
+╰───────────────────╯`,
       footer: '˗ˏˋ ☾ 𝚟𝚊𝚛𝚎𝚋𝚘𝚝 ☽ ˎˊ˗',
       contextInfo: dynamicContextInfo
     };
@@ -62,21 +62,21 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
     const enabled = isEnable ? '🟢 *ATTIVATA*' : '🔴 *DISATTIVATA*';
 
     const adminOnly =
-`╭────〔 ❌ *ACCESSO NEGATO* ❌ 〕────╮
+`╭〔 ❌ *ACCESSO NEGATO* ❌ 〕╮
 │
 │ Questo comando è riservato
 │ agli *ADMIN DEL GRUPPO*
 │
-╰────────────────────────────╯`;
+╰──────────────────────╯`;
 
     const ownerOnly =
-`╭────〔 👑 *SOLO OWNER* 👑 〕────╮
+`╭〔 👑 *SOLO OWNER* 👑 〕╮
 │
 │ Questa funzione è riservata
 │ esclusivamente al creatore
 │ del bot
 │
-╰────────────────────────────╯`;
+╰───────────────────╯`;
 
     switch (type) {
 
@@ -89,12 +89,12 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
         }
         chat.welcome = isEnable;
         result.status =
-`╭────〔 👋 *WELCOME* 👋 〕────╮
+`╭〔 👋 *WELCOME* 👋 〕╮
 │ Stato: ${enabled}
 │
 │ Il bot ora gestirà
 │ i messaggi di benvenuto
-╰────────────────────╯`;
+╰──────────────────╯`;
         break;
 
       case 'goodbye':
@@ -103,12 +103,12 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
         }
         chat.goodbye = isEnable;
         result.status =
-`╭────〔 🚪 *ADDIO* 🚪 〕────╮
+`╭─〔 🚪 *ADDIO* 🚪 〕─╮
 │ Stato: ${enabled}
 │
 │ Messaggi di uscita
 │ configurati correttamente
-╰──────────────────╯`;
+╰────────────────╯`;
         break;
 
       case 'antiprivato':
@@ -117,12 +117,12 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
         }
         bot.antiprivato = isEnable;
         result.status =
-`╭────〔 🔒 *ANTIPRIVATO* 🔒 〕────╮
+`╭─〔 🔒 *ANTIPRIVATO* 🔒 〕─╮
 │ Stato: ${enabled}
 │
 │ Il bot non accetterà
 │ messaggi in privato
-╰──────────────────────╯`;
+╰───────────────────╯`;
         break;
 
       case 'antibot':
@@ -131,7 +131,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
         }
         chat.antiBot = isEnable;
         result.status =
-`╭────〔 🤖 *ANTIBOT* 🤖 〕────╮
+`╭〔 🤖 *ANTIBOT* 🤖 〕╮
 │ Stato: ${enabled}
 │
 │ Bot indesiderati
@@ -145,22 +145,22 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
         }
         chat.antiLink = isEnable;
         result.status =
-`╭────〔 🔗 *ANTILINK* 🔗 〕────╮
+`╭〔 🔗 *ANTILINK* 🔗 〕╮
 │ Stato: ${enabled}
 │
 │ I link non consentiti
 │ verranno bloccati
-╰──────────────────╯`;
+╰────────────────╯`;
         break;
 
       default:
         result.status =
-`╭────〔 ❓ *COMANDO SCONOSCIUTO* ❓ 〕────╮
+`╭─〔 ❓ *COMANDO* ❓ 〕╮
 │
 │ La funzione "${type}"
 │ non è riconosciuta
 │
-╰────────────────────────────╯`;
+╰───────────────────╯`;
         break;
     }
 
@@ -169,14 +169,14 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, isR
 
   /* ================= RIEPILOGO ================= */
   let summary =
-`╭────〔 📋 *RIEPILOGO OPERAZIONI* 📋 〕────╮
+` ╭〔 📋 *RIEPILOGO* 📋 〕╮
 │`;
 
   for (let r of results) {
     summary += `\n│ 🔹 ${r.type}\n│ ${r.status.replace(/\n/g, '\n│ ')}`;
   }
 
-  summary += `\n╰──────────────────────────────────╯`;
+  summary += `\n╰────────────────╯`;
 
   await conn.sendMessage(m.chat, {
     text: summary,
