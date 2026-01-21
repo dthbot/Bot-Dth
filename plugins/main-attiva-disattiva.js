@@ -168,7 +168,7 @@ ${lines.map(l => `│ ${l}`).join('\n')}
 
 handler.help = ['attiva', 'disattiva']
 handler.tags = ['group']
-handler.command = ['attiva', 'disattiva', 'enable', 'disable', 'on', 'off']
+handler.command = ['attiva', 'disattiva', 'enable', 'disable', 'on', 'off', '1', '0']
 handler.group = false
 
 export default handler
