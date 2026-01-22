@@ -1,43 +1,67 @@
-let handler = async (m, { conn, text, participants }) => {
-    const gAdmins = participants.filter(p => p.admin)
+let handler = async (m, { conn, participants }) => {
+
     const botId = conn.user.jid
-    const gOwner = gAdmins.find(p => p.isAdmin)?.id
-    const gNoAdmins = participants.filter(p => p.id !== botId && p.id !== gOwner && !p.admin)
 
-    if (participants.length === gAdmins.length || gNoAdmins.length === 0) { 
-        return m.reply('*⚠️ Nessun utente valido da rimuovere (forse sono tutti admin).*')
-    }
+    // === ADMIN & OWNER ===
+    const admins = participants.filter(p => p.admin)
+    const owner = admins.find(p => p.admin === 'superadmin')?.id
 
-    const randomUser = gNoAdmins[Math.floor(Math.random() * gNoAdmins.length)]
-    let tag = ''
-    try {
-        const user = await conn.getName(randomUser.id)
-        tag = user || randomUser.id.split('@')[0]
-    } catch {
-        tag = randomUser.id.split('@')[0]
-    }
-
-    const probability = (100 / gNoAdmins.length).toFixed(2)
-
-    await conn.reply(
-        m.chat, 
-        `*✧ Selezione Casuale: ${tag}*\n> Era destino che venissi scelto.\n> Probabilità: ${probability}%`, 
-        m
+    // === UTENTI KICKABILI ===
+    const kickable = participants.filter(p =>
+        p.id !== botId &&
+        p.id !== owner &&
+        !p.admin
     )
 
+    if (!kickable.length) {
+        return m.reply('*⚠️ Nessun utente valido da rimuovere (tutti admin o owner).*')
+    }
+
+    // === RANDOM ===
+    const randomUser = kickable[Math.floor(Math.random() * kickable.length)]
+    const userJid = randomUser.id
+    const userTag = userJid.split('@')[0]
+
+    const probability = (100 / kickable.length).toFixed(2)
+
+    // === ANNUNCIO ===
+    await conn.reply(
+        m.chat,
+        `🎯 *Selezione Casuale*\n` +
+        `╭─────────────\n` +
+        `│ 👤 Utente: @${userTag}\n` +
+        `│ 🎲 Probabilità: ${probability}%\n` +
+        `╰─────────────`,
+        m,
+        { mentions: [userJid] }
+    )
+
+    // === RIMOZIONE ===
     try {
-        await conn.groupParticipantsUpdate(m.chat, [randomUser.id], 'remove')
-        await conn.reply(m.chat, `令 *${tag}* è stato eliminato.`, m)
-        m.react('✅')
+        await conn.groupParticipantsUpdate(m.chat, [userJid], 'remove')
+
+        await conn.reply(
+            m.chat,
+            `💥 *@${userTag}* è stato rimosso dal gruppo.`,
+            m,
+            { mentions: [userJid] }
+        )
+
+        m.react('🖕🏻')
     } catch (e) {
         console.error(e)
-        await conn.reply(m.chat, `❌ Non sono riuscito a rimuovere ${tag}. Forse ha già lasciato il gruppo o non ho i permessi.`, m)
+        await conn.reply(
+            m.chat,
+            `❌ Non posso rimuovere *@${userTag}*.\n> Forse è admin o owner.`,
+            m,
+            { mentions: [userJid] }
+        )
     }
 }
 
 handler.help = ['rouletteban']
 handler.tags = ['giochi']
-handler.command = /^(kickrandom|rouletterussa|rban|rouletteban)$/i
+handler.command = /^(kickrandom|rouletterussa|rsban|rouletteban)$/i
 handler.admin = true
 handler.botAdmin = true
 handler.group = true
