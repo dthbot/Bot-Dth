@@ -191,6 +191,8 @@ export async function before(m, { conn, groupMetadata }) {
 │  ✧ Ha lasciato il gruppo
 │
 │  ❖ *Membri attuali:* ${memberCount}
+│     
+│  🤬 *CAZZO ESCE STO CANE*
 │
 ╰───────────────╯
 `
@@ -202,7 +204,7 @@ export async function before(m, { conn, groupMetadata }) {
 │
 │  ❖ *Membri:* ${memberCount}
 │
-│  💫 Sentiti a casa e divertiti!
+│  💫 *Benvenuto nel team BVO*
 │
 ╰───────────────╯
 `;
