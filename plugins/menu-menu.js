@@ -1,13 +1,13 @@
 /**
- * MENU SOLO TESTO – NO IMMAGINI
+ * MENU SOLO TESTO – NO IMMAGINI E SENZA PULSANTI
  */
 
 const handler = async (message, { conn, usedPrefix = '.' }) => {
 
-    const userId = message.sender
-    const groupId = message.isGroup ? message.chat : null
+    const userId = message.sender;
+    const groupId = message.isGroup ? message.chat : null;
 
-    const userCount = Object.keys(global.db?.data?.users || {}).length
+    const userCount = Object.keys(global.db?.data?.users || {}).length;
 
     const menuText = `
 𝔻𝕋ℍ-𝔹𝕆𝕋 *MENU PRINCIPALE*
@@ -29,25 +29,15 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 ➤ ${usedPrefix}funzioni
 
 ════════════════════
-💫 Usa i pulsanti qui sotto
-`;
+💫 Usa i comandi sopra per navigare
+`.trim();
 
-    await conn.sendMessage(message.chat, {
-        text: menuText,
-        footer: 'Scegli una categoria:',
-        buttons: [
-            { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '🛡️ Menu Admin' }, type: 1 },
-            { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: '👑 Menu Owner' }, type: 1 },
-            { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: '🚨 Menu Sicurezza' }, type: 1 },
-            { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: '👥 Menu Gruppo' }, type: 1 },
-            { buttonId: `${usedPrefix}menuia`, buttonText: { displayText: '🤖 Menu IA' }, type: 1 }
-        ],
-        viewOnce: true
-    })
-}
+    // INVIO SOLO TESTO
+    await conn.sendMessage(message.chat, { text: menuText });
+};
 
-handler.help = ['menu', 'comandi']
-handler.tags = ['menu']
-handler.command = /^(menu|comandi)$/i
+handler.help = ['menu', 'comandi'];
+handler.tags = ['menu'];
+handler.command = /^(menu|comandi)$/i;
 
-export default handler
+export default handler;
