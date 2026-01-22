@@ -185,7 +185,7 @@ export async function before(m, { conn, groupMetadata }) {
     ======================= */
     const caption = isRemove
         ? `
-╭───❍「 👋 ADDIO 」❍───╮
+╭❍「 👋 ADDIO 」❍╮
 │
 │  ✦ *Utente:* @${cleanUserId}
 │  ✧ Ha lasciato il gruppo
@@ -197,7 +197,7 @@ export async function before(m, { conn, groupMetadata }) {
 ╰───────────────╯
 `
         : `
-╭───❍「 🌟 BENVENUTO 🌟 」❍───╮
+╭❍「 🌟 BENVENUTO 🌟 」❍╮
 │
 │  ✦ *Utente:* @${cleanUserId}
 │  ✧ *Gruppo:* ${groupName}
