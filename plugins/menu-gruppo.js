@@ -103,7 +103,7 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 ➤ ${usedPrefix}menumod
 ➤ ${usedPrefix}menuadmin
 ➤ ${usedPrefix}menuowner
-➤ ${usedPrefix}menusicurezza
+➤ ${usedPrefix}funzioni
 
 ════════════════════
 🔖 Versione: *2.0*
