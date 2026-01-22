@@ -21,7 +21,7 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 ➤ ${usedPrefix}menuadmin
 ➤ ${usedPrefix}menuowner
 ➤ ${usedPrefix}menugruppo
-➤ ${usedPrefix}menusicurezza
+➤ ${usedPrefix}funzioni 
 
 ════════════════════
 🔖 Versione: *2.0*
