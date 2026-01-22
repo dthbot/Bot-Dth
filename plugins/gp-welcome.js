@@ -52,14 +52,14 @@ export async function before(m, { conn, groupMetadata }) {
 ╰───────────────╯
 `
         : `
-╭───❍「 🌟 BENVENUTO 🌟 」❍───╮
+╭❍「 🌟 BENVENUTO 🌟 」❍╮
 │
 │  ✦ *Utente:* @${cleanUserId}
 │  ✧ *Gruppo:* ${groupName}
 │
 │  ❖ *Membri:* ${memberCount}
 │
-│  💫 Sentiti a casa e divertiti!
+│  💫 *Benvenuto nel team BVO*
 │
 ╰───────────────╯
 `
