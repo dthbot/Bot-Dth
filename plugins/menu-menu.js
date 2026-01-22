@@ -21,6 +21,13 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 ➤ ${usedPrefix}staff
 ➤ ${usedPrefix}creatore
 
+🎉 *ALTRI MENU*
+➤ ${usedPrefix}menumod
+➤ ${usedPrefix}menuowner
+➤ ${usedPrefix}menugruppo
+➤ ${usedPrefix}menuadmin
+➤ ${usedPrefix}funzioni
+
 ════════════════════
 💫 Usa i pulsanti qui sotto
 `;
