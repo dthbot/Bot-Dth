@@ -1,3 +1,5 @@
+import fetch from 'node-fetch'
+
 const handler = async (m, { conn }) => {
   let who;
   if (m.isGroup)
@@ -14,16 +16,19 @@ const handler = async (m, { conn }) => {
   if (!user.premium)
     return m.reply('ℹ️ Questo utente non è un MODERATORE.');
 
-  // Rimuove premium
+  // Rimuove moderatore
   user.premium = false;
   user.premiumTime = 0;
 
-  // Foto profilo
-  let pp;
+  // Foto profilo → thumbnail
+  let thumb;
   try {
-    pp = await conn.profilePictureUrl(who, 'image');
+    const ppUrl = await conn.profilePictureUrl(who, 'image');
+    const res = await fetch(ppUrl);
+    thumb = await res.buffer();
   } catch {
-    pp = 'https://i.ibb.co/3Fh9V6p/avatar-contact.png';
+    const res = await fetch('https://i.ibb.co/3Fh9V6p/avatar-contact.png');
+    thumb = await res.buffer();
   }
 
   const name = '@' + who.split('@')[0];
@@ -41,9 +46,11 @@ const handler = async (m, { conn }) => {
   await conn.sendMessage(
     m.chat,
     {
-      image: { url: pp },
-      caption,
-      mentions: [who]
+      text: caption,
+      mentions: [who],
+      contextInfo: {
+        jpegThumbnail: thumb
+      }
     },
     { quoted: m }
   );
