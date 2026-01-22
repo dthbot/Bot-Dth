@@ -2,10 +2,10 @@
  * MENU GRUPPO – SOLO TESTO
  */
 
-const handler = async (message, { conn, usedPrefix }) => {
+const handler = async (message, { conn, usedPrefix = '.' }) => {
 
     const menuText = `
-⚡ 𝑴𝑬𝑵𝑼 𝐆𝐑𝐔𝐏𝐏𝐎 ⚡
+⚡ *MENU GRUPPO* ⚡
 ════════════════════
 
 🌍 *INFO & UTILITÀ*
@@ -98,21 +98,18 @@ const handler = async (message, { conn, usedPrefix }) => {
 ➤ ${usedPrefix}ditalino
 
 ════════════════════
-🔖 Versione: 2.0
+📂 *ALTRI MENU*
+➤ ${usedPrefix}menu
+➤ ${usedPrefix}menumod
+➤ ${usedPrefix}menuadmin
+➤ ${usedPrefix}menuowner
+➤ ${usedPrefix}menusicurezza
+
+════════════════════
+🔖 Versione: *2.0*
 `.trim();
 
-    await conn.sendMessage(message.chat, {
-        text: menuText,
-        footer: 'Scegli un menu:',
-        buttons: [
-            { buttonId: `${usedPrefix}menu`, buttonText: { displayText: '🏠 Menu Principale' }, type: 1 },
-            { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '🛡️ Menu Admin' }, type: 1 },
-            { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: '👑 Menu Owner' }, type: 1 },
-            { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: '🚨 Menu Sicurezza' }, type: 1 },
-            { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '🤖 Menu MOD' }, type: 1 }
-        ],
-        viewOnce: true
-    });
+    await conn.sendMessage(message.chat, { text: menuText });
 };
 
 handler.help = ['menugruppo'];
