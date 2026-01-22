@@ -1,76 +1,46 @@
-import { performance } from 'perf_hooks';
-import fetch from 'node-fetch';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 /**
- * Menu principale
+ * MENU SOLO TESTO – NO IMMAGINI
  */
-function generateMenuText(userCount = 0) {
-  return `𝔻𝕋ℍ-𝔹𝕆𝕋 *Menu Principale*
 
-Utenti registrati: *${userCount}*
+const handler = async (message, { conn, usedPrefix = '.' }) => {
 
-─────────────────────`;
-}
+    const userId = message.sender
+    const groupId = message.isGroup ? message.chat : null
 
-const handler = async (message, { conn, usedPrefix = '.', command }) => {
-    const userId = message.sender;
-    const groupId = message.isGroup ? message.chat : null;
+    const userCount = Object.keys(global.db?.data?.users || {}).length
 
-    const userCount = Object.keys(global.db?.data?.users || {}).length;
+    const menuText = `
+𝔻𝕋ℍ-𝔹𝕆𝕋 *MENU PRINCIPALE*
 
-    const extraMenu = `
-🏠 *MENU PRINCIPALE*
-
-👑 FOUNDER 👑
 ════════════════════
-💀 *Founder*
-➤ 𝕯𝖊ⱥ𝖉𝖑𝐲
+👥 Utenti registrati: *${userCount}*
 ════════════════════
-⚙️ *COMANDI*
-➤ Gruppidth 🤖
-➤ Rsban 👾
-➤ Ping 🚀
-➤ Staff 🤖
-➤ Creatore 👑
+
+🏠 *COMANDI PRINCIPALI*
+➤ ${usedPrefix}ping
+➤ ${usedPrefix}staff
+➤ ${usedPrefix}creatore
+
 ════════════════════
-🔖 Versione: ${global.vs || '1.0.0'}
+💫 Usa i pulsanti qui sotto
 `;
 
-    const menuText = generateMenuText(userCount) + extraMenu;
-
-    const imagePath = path.join(__dirname, '../media/principale.jpeg');
-
-    const footerText = global.t ? global.t('menuFooter', userId, groupId) : 'Scegli un menu:';
-    const adminMenuText = global.t ? global.t('menuAdmin', userId, groupId) : '🛡️ Menu Admin';
-    const ownerMenuText = global.t ? global.t('menuOwner', userId, groupId) : '👑 Menu Owner';
-    const securityMenuText = global.t ? global.t('menuSecurity', userId, groupId) : '🚨 Menu Sicurezza';
-    const groupMenuText = global.t ? global.t('menuGroup', userId, groupId) : '👥 Menu Gruppo';
-    const aiMenuText = global.t ? global.t('menuAI', userId, groupId) : '🤖 Menu IA';
-
     await conn.sendMessage(message.chat, {
-        image: { url: imagePath },
-        caption: menuText,
-        footer: footerText,
+        text: menuText,
+        footer: 'Scegli una categoria:',
         buttons: [
-            { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: adminMenuText }, type: 1 },
-            { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: ownerMenuText }, type: 1 },
-            { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: securityMenuText }, type: 1 },
-            { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: groupMenuText }, type: 1 },
-            { buttonId: `${usedPrefix}menuia`, buttonText: { displayText: aiMenuText }, type: 1 }
+            { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '🛡️ Menu Admin' }, type: 1 },
+            { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: '👑 Menu Owner' }, type: 1 },
+            { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: '🚨 Menu Sicurezza' }, type: 1 },
+            { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: '👥 Menu Gruppo' }, type: 1 },
+            { buttonId: `${usedPrefix}menuia`, buttonText: { displayText: '🤖 Menu IA' }, type: 1 }
         ],
-        viewOnce: true,
-        headerType: 4
-    });
-};
+        viewOnce: true
+    })
+}
 
-handler.help = ['menu'];
-handler.tags = ['menu'];
-handler.command = /^(menu|comandi)$/i;
+handler.help = ['menu', 'comandi']
+handler.tags = ['menu']
+handler.command = /^(menu|comandi)$/i
 
-export default handler;
+export default handler
