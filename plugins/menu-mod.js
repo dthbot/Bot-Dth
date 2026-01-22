@@ -11,7 +11,7 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 🛠️ *COMANDI MOD*
 ➤ ${usedPrefix}tagmod
 ➤ ${usedPrefix}pingmod
-➤ ${usedPrefix}dsmod
+➤ ${usedPrefix}delm
 ➤ ${usedPrefix}warnmod
 ➤ ${usedPrefix}unwarnmod
 
