@@ -1,5 +1,9 @@
+let handler = async (m, { conn, participants, isOwner, isAdmin, user }) => {
 
-let handler = async (m, { conn, participants }) => {
+    // 🔐 CONTROLLO PERMESSI (MOD / PREMIUM)
+    if (!isOwner && !isAdmin && !user.premium) {
+        return m.reply('⛔ *Questo comando è riservato ai MOD / PREMIUM*')
+    }
 
     // Prende in automatico il link del gruppo
     let code = await conn.groupInviteCode(m.chat)
