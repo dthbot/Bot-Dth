@@ -1,16 +1,22 @@
-let handler = async (m, { conn }) => {
-if (!(m.chat in global.db.data.chats)) return conn.reply(m.chat, '🎌 *Questo chat non è registrata!*', m, fake)
-let chat = global.db.data.chats[m.chat]
-if (!chat.isBanned) return conn.reply(m.chat, '《★》Il bot non è bannato in questa chat', m, fake)
-chat.isBanned = false
-await conn.reply(m.chat, `《★》varebot è stato sbannato in questa chat.`, m, fake)
-}
-handler.help = ['sbanchat'];
-handler.tags = ['creatore'];
-handler.command = ['unbanchat', 'sbannachat', 'sbanchat']
-handler.rowner = true
-handler.admin = true 
-handler.botAdmin = false
-handler.group = false
+let handler = async (m) => {
+  global.db.data.chats[m.chat].isBanned = false;
+  let message = '𝐌𝐨𝐝𝐚𝐥𝐢𝐭à 𝐀𝐅𝐊 𝐝𝐢𝐬𝐚𝐭𝐭𝐢𝐯𝐚𝐭𝐚, 𝐬𝐨𝐧𝐨 𝐭𝐨𝐫𝐧𝐚𝐭𝐨 𝐑𝐈𝐊𝐊𝐈𝐎𝐍𝐈 ✓';
+  await conn.sendMessage(m.chat, { 
+      text: message,
+      contextInfo: {
+          forwardingScore: 99,
+          isForwarded: true,
+          forwardedNewsletterMessageInfo: {
+              newsletterJid: '',
+              serverMessageId: '',
+              newsletterName: '𝔻𝕋ℍ-𝔹𝕆𝕋'
+          }
+      }
+  }, { quoted: m });
+};
 
-export default handler
+handler.help = ['unbanchat'];
+handler.tags = ['owner'];
+handler.command = /^wakeywakey$/i;
+handler.rowner = true;
+export default handler;
