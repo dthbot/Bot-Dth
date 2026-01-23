@@ -36,7 +36,6 @@ handler.help = ['delete']
 handler.tags = ['group']
 handler.command = /^delm?$/i
 handler.group = false
-handler.admin = true
 handler.botAdmin = true
 handler.premium = false
 
