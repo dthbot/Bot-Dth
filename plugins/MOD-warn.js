@@ -3,7 +3,7 @@ import fetch from 'node-fetch'
 const getThumb = async () =>
   Buffer.from(await (await fetch('https://qu.ax/fmHdc.png')).arrayBuffer())
 
-let handler = async (m, { conn, text, command, isOwner }) => {
+let handler = async (m, { conn, text, command, isOwner, isAdmin }) => {
   // ================= UTENTE =================
   let who
   if (m.isGroup)
@@ -12,9 +12,10 @@ let handler = async (m, { conn, text, command, isOwner }) => {
 
   if (!who) return
 
-  // Controllo permessi: owner o premium
+  // ================= PERMESSI =================
   const senderDB = global.db.data.users[m.sender] || {}
-  if (!isOwner && !senderDB.premium) {
+
+  if (!isOwner && !isAdmin && !senderDB.premium) {
     return m.reply('⛔ *Questo comando è riservato ai MOD / PREMIUM*')
   }
 
