@@ -821,21 +821,22 @@ global.dfail = async (type, m, conn) => {
     const nome = m.pushName || 'sam'
     const etarandom = Math.floor(Math.random() * 21) + 13
     const msg = {
-        sam: '⛔ ACCESS BLOCKED\nCreatore non rilevato.',
-        rowner: '⛔ ROOT ACCESS ONLY\nOperazione annullata.',
-        owner: '⛔ OWNER PRIVILEGES REQUIRED\nEsecuzione negata.',
-        mods: '⛔ MODERATOR ACCESS REQUIRED\nPermessi mancanti.',
-        premium: '⛔ PREMIUM STATUS REQUIRED\nUpgrade necessario.',
-        group: '⛔ INVALID CONTEXT\nUsare solo nei gruppi.',
-        private: '⛔ PRIVATE CONTEXT REQUIRED\nUsare solo in chat privata.',
-        admin: '⛔ ADMIN REQUIRED\nPermessi di gruppo mancanti.',
-        botAdmin: '⛔ BOT NOT ADMIN\nElevare privilegi del bot.',
-        unreg: `⛔ USER NOT REGISTERED
-Registrazione necessaria.
+        sam: '🔮 Incantesimo bloccato.\nSolo il Creatore Supremo può evocare questo potere.',
+        rowner: '👑 Volontà del Re richiesta.\nQuesto potere appartiene solo al creatore del bot.',
+        owner: '🛡️ Sigillo reale attivo.\nSolo gli Owner possono usare questa abilità.',
+        mods: '⚔️ Accesso negato.\nSolo i Moderatori del regno possono usare questo comando.',
+        premium: '💎 Arte arcana bloccata.\nSolo gli utenti Premium possono evocare questo potere.',
+        group: '🏰 Luogo errato.\nQuesto incantesimo può essere usato solo nei gruppi.',
+        private: '📜 Segreto antico.\nQuesta magia funziona solo in privato.',
+        admin: '🧱 Guardia del Regno.\nSolo gli Admin del gruppo possono usare questo comando.',
+        botAdmin: '🐲 Il Guardiano dorme.\nIl bot deve essere Admin per continuare.',
+        unreg: `📛 Avventuriero sconosciuto.
+Devi registrarti prima di usare le arti magiche.
 
+Esempio:
 .reg ${nome} ${etarandom}`,
-        restrict: '⛔ SYSTEM RESTRICTED\nFunzione bloccata.',
-        disabled: '⛔ COMMAND DISABLED\nComando offline.'
+        restrict: '🚫 Portale sigillato.\nQuesta funzione è attualmente bloccata.',
+        disabled: '🚫 Magia proibita.\nQuesto comando è stato disabilitato.'
     }[type]
     if (msg) {
         conn.reply(m.chat, msg, m, global.rcanal).catch(e => console.error('[ERRORE] Errore in dfail:', e))
