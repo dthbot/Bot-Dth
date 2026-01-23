@@ -205,6 +205,5 @@ ${isOwner ? '> vare ✧ bot' : '> vare ❀ bot'}`
 handler.help = ['classifica']
 handler.tags = ['main']
 handler.command = ['leaderboard', 'lb', 'classifica']
-handler.register = true
 
 export default handler
