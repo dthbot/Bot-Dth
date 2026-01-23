@@ -1,4 +1,9 @@
-let handler = async (m, { conn, usedPrefix, command }) => {
+let handler = async (m, { conn, usedPrefix, command, isOwner, isAdmin, user }) => {
+
+  // 🔐 CONTROLLO PERMESSI (MOD / PREMIUM)
+  if (!isOwner && !isAdmin && !user.premium) {
+    return m.reply('⛔ *Questo comando è riservato ai MOD / PREMIUM*')
+  }
 
   if (!m.quoted) return
 
@@ -21,10 +26,8 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     await conn.sendMessage(m.chat, { delete: m.key })
 
   } catch {
-    // Elimina il messaggio citato in caso di errore
+    // Fallback in caso di errore
     await conn.sendMessage(m.chat, { delete: m.quoted.vM.key })
-
-    // Elimina il messaggio del comando `.del` in caso di errore
     await conn.sendMessage(m.chat, { delete: m.key })
   }
 }
