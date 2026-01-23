@@ -51,6 +51,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 handler.help = ['githubsearch', 'ghsearch']
 handler.tags = ['ricerca']
-handler.command = /^(githubsearch|ghsearch)$/i
+handler.command = /^(githubsearch|github|ghsearch)$/i
 
 export default handler
