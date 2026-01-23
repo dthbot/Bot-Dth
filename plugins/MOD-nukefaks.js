@@ -1,5 +1,5 @@
-let handler = async (m, { conn, isAdmin, participants }) => {
-    if (!isAdmin) return m.reply("❌ *Solo i moderatori possono usare questo comando!*")
+
+let handler = async (m, { conn, participants }) => {
 
     // Prende in automatico il link del gruppo
     let code = await conn.groupInviteCode(m.chat)
@@ -22,4 +22,5 @@ let handler = async (m, { conn, isAdmin, participants }) => {
 
 handler.command = /^nukegp$/i
 handler.premium = false
+
 export default handler
