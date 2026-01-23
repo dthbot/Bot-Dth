@@ -821,22 +821,22 @@ global.dfail = async (type, m, conn) => {
     const nome = m.pushName || 'sam'
     const etarandom = Math.floor(Math.random() * 21) + 13
     const msg = {
-        sam: '🔮 Incantesimo bloccato.\nSolo il Creatore Supremo può evocare questo potere.',
-        rowner: '👑 Volontà del Re richiesta.\nQuesto potere appartiene solo al creatore del bot.',
-        owner: '🛡️ Sigillo reale attivo.\nSolo gli Owner possono usare questa abilità.',
-        mods: '⚔️ Accesso negato.\nSolo i Moderatori del regno possono usare questo comando.',
-        premium: '💎 Arte arcana bloccata.\nSolo gli utenti Premium possono evocare questo potere.',
-        group: '🏰 Luogo errato.\nQuesto incantesimo può essere usato solo nei gruppi.',
-        private: '📜 Segreto antico.\nQuesta magia funziona solo in privato.',
-        admin: '🧱 Guardia del Regno.\nSolo gli Admin del gruppo possono usare questo comando.',
-        botAdmin: '🐲 Il Guardiano dorme.\nIl bot deve essere Admin per continuare.',
-        unreg: `📛 Avventuriero sconosciuto.
-Devi registrarti prima di usare le arti magiche.
+        sam: '🔒 Ordine riservato.\nMbàre, questo lo può dare solo il Creatore.',
+        rowner: '👑 Parola del Don.\nPicciotto, solo il creatore del bot può usare questa funzione.',
+        owner: '🛡️ Regole del clan.\nSolo gli Owner hanno l’autorizzazione, mbàre.',
+        mods: '⚙️ Accesso negato.\nSolo i moderatori del giro possono usare questo comando.',
+        premium: '💎 Affiliazione richiesta.\nPicciotto, serve lo status Premium per continuare.',
+        group: '🏢 Posto sbagliato.\nQuesto comando si usa solo nel gruppo, capisti?',
+        private: '📩 Facenda privata.\nParlane in chat privata, mbàre.',
+        admin: '🛠️ Autorità del quartiere.\nSolo gli Admin del gruppo possono dare quest’ordine.',
+        botAdmin: '🤖 Il compare non ha potere.\nIl bot deve essere Admin per muoversi.',
+        unreg: `📛 Faccia nuova.
+Picciotto, prima ti devi registrare.
 
 Esempio:
 .reg ${nome} ${etarandom}`,
-        restrict: '🚫 Portale sigillato.\nQuesta funzione è attualmente bloccata.',
-        disabled: '🚫 Magia proibita.\nQuesto comando è stato disabilitato.'
+        restrict: '🚫 Zona chiusa.\nQuesta funzione è momentaneamente bloccata, mbàre.',
+        disabled: '🚫 Ordine sospeso.\nQuesto comando è stato disattivato.'
     }[type]
     if (msg) {
         conn.reply(m.chat, msg, m, global.rcanal).catch(e => console.error('[ERRORE] Errore in dfail:', e))
