@@ -821,22 +821,22 @@ global.dfail = async (type, m, conn) => {
     const nome = m.pushName || 'sam'
     const etarandom = Math.floor(Math.random() * 21) + 13
     const msg = {
-        sam: '🔒 Ordine riservato.\nMbàre, questo lo può dare solo il Creatore.',
-        rowner: '👑 Parola del Don.\nPicciotto, solo il creatore del bot può usare questa funzione.',
-        owner: '🛡️ Regole del clan.\nSolo gli Owner hanno l’autorizzazione, mbàre.',
-        mods: '⚙️ Accesso negato.\nSolo i moderatori del giro possono usare questo comando.',
-        premium: '💎 Affiliazione richiesta.\nPicciotto, serve lo status Premium per continuare.',
-        group: '🏢 Posto sbagliato.\nQuesto comando si usa solo nel gruppo, capisti?',
-        private: '📩 Facenda privata.\nParlane in chat privata, mbàre.',
-        admin: '🛠️ Autorità del quartiere.\nSolo gli Admin del gruppo possono dare quest’ordine.',
-        botAdmin: '🤖 Il compare non ha potere.\nIl bot deve essere Admin per muoversi.',
-        unreg: `📛 Faccia nuova.
-Picciotto, prima ti devi registrare.
+        sam: '🔒 𝗔𝗖𝗖𝗘𝗦𝗦𝗢 𝗥𝗜𝗦𝗘𝗥𝗩𝗔𝗧𝗢\nMbàre, solo il 𝗕𝗼𝘀𝘀 Supremo può dare questo ordine.',
+        rowner: '👑 𝗕𝗢𝗦𝗦\nPicciotto, solo il Don può usare questa funzione.',
+        owner: '🛡️ 𝗖𝗔𝗣𝗢\nSolo i Capo possono eseguire questo comando, mbàre.',
+        mods: '⚙️ 𝗦𝗢𝗦𝗧𝗢𝗖𝗔𝗣𝗢\nSolo i sottocapi del clan possono ordinarlo.',
+        premium: '💎 𝗙𝗜𝗗𝗘𝗟𝗜𝗧À\nPicciotto, serve lo status Premium per usare questo potere.',
+        group: '👥 𝗙AMIGLIA\nQuesto comando funziona solo nel gruppo.',
+        private: '📩 𝗙ACCENDA PRIVATA\nParla direttamente con il Boss, mbàre.',
+        admin: '🛠️ 𝗔𝗜𝗨𝗧𝗔𝗡𝗧𝗘\nSolo gli aiutanti del clan possono dare quest’ordine.',
+        botAdmin: '🤖 𝗩𝗜𝗚𝗜𝗟𝗘\nIl bot deve avere poteri da Admin per agire.',
+        unreg: `📛 𝗡𝗨𝗢𝗩𝗢 𝗣𝗜𝗖𝗖𝗜𝗢𝗧𝗧𝗢
+Mbàre, prima ti devi registrare.
 
 Esempio:
 .reg ${nome} ${etarandom}`,
-        restrict: '🚫 Zona chiusa.\nQuesta funzione è momentaneamente bloccata, mbàre.',
-        disabled: '🚫 Ordine sospeso.\nQuesto comando è stato disattivato.'
+        restrict: '🚫 𝗭𝗢𝗡𝗔 𝗖𝗛𝗜𝗨𝗦𝗔\nFunzione momentaneamente bloccata.',
+        disabled: '🚫 𝗢𝗥𝗗𝗜𝗡𝗘 𝗦𝗢𝗦𝗣𝗘𝗦𝗢\nQuesto comando è stato disattivato.'
     }[type]
     if (msg) {
         conn.reply(m.chat, msg, m, global.rcanal).catch(e => console.error('[ERRORE] Errore in dfail:', e))
