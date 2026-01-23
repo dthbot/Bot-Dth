@@ -821,18 +821,21 @@ global.dfail = async (type, m, conn) => {
     const nome = m.pushName || 'sam'
     const etarandom = Math.floor(Math.random() * 21) + 13
     const msg = {
-        sam: '- 〘 🔒 〙 *`ꪶ͢Comando riservato esclusivamente al creatoreꫂ`*',
-        rowner: '- 〘 👑 〙- *`ꪶ͢Solo il creatore del bot può usare questa funzioneꫂ`*',
-        owner: '- 〘 🛡️ 〙 *`ꪶ͢Solo gli owner del bot possono usare questa funzioneꫂ`*',
-        mods: '- 〘 ⚙️ 〙 *`ꪶ͢Solo i moderatori possono usare questo comandoꫂ`*',
-        premium: '- 〘 💎 〙 *`ꪶ͢Solo gli utenti premium possono usare questo comandoꫂ`*',
-        group: '- 〘 👥 〙 *`ꪶ͢Questo comando va usato solo nei gruppiꫂ`*',
-        private: '- 〘 📩 〙 *`ꪶ͢Questa funzione può essere usata solo in privatoꫂ`*',
-        admin: '- 〘 🛠️ 〙 *`ꪶ͢Solo gli admin del gruppo possono usare questo comandoꫂ`*',
-        botAdmin: '- 〘 🤖 〙 *`ꪶ͢Devo essere admin per eseguire questo comandoꫂ`*',
-        unreg: `- 〘 📛 〙 *\`ꪶ͢Non sei registrato/a, registrati per usare questa funzioneꫂ\`*\n> *\`ꪶ͢Formato: nome etàꫂ\`*\n\n *_esempio:_*\n *\`.reg ${nome} ${etarandom}\`*`,
-        restrict: '- 〘 🚫 〙 *`ꪶ͢Questa funzione è attualmente disattivataꫂ`*',
-        disabled: '- 〘 🚫 〙 *`ꪶ͢Questo comando è attualmente disabilitatoꫂ`*'
+        sam: '⛔ ACCESS BLOCKED\nCreatore non rilevato.',
+        rowner: '⛔ ROOT ACCESS ONLY\nOperazione annullata.',
+        owner: '⛔ OWNER PRIVILEGES REQUIRED\nEsecuzione negata.',
+        mods: '⛔ MODERATOR ACCESS REQUIRED\nPermessi mancanti.',
+        premium: '⛔ PREMIUM STATUS REQUIRED\nUpgrade necessario.',
+        group: '⛔ INVALID CONTEXT\nUsare solo nei gruppi.',
+        private: '⛔ PRIVATE CONTEXT REQUIRED\nUsare solo in chat privata.',
+        admin: '⛔ ADMIN REQUIRED\nPermessi di gruppo mancanti.',
+        botAdmin: '⛔ BOT NOT ADMIN\nElevare privilegi del bot.',
+        unreg: `⛔ USER NOT REGISTERED
+Registrazione necessaria.
+
+.reg ${nome} ${etarandom}`,
+        restrict: '⛔ SYSTEM RESTRICTED\nFunzione bloccata.',
+        disabled: '⛔ COMMAND DISABLED\nComando offline.'
     }[type]
     if (msg) {
         conn.reply(m.chat, msg, m, global.rcanal).catch(e => console.error('[ERRORE] Errore in dfail:', e))
