@@ -1,149 +1,140 @@
-const handler = async (m, { conn, text, command, usedPrefix }) => {
-    try {
-        const target = getTargetUser(m, text);
-        
-        if (!target) {
-            return m.reply(createUsageMessage(usedPrefix, command));
-        }
-        const groupMembers = m.isGroup ? (await conn.groupMetadata(m.chat)).participants.map(p => p.id) : [];
-        if (m.isGroup && !groupMembers.includes(target)) {
-             return m.reply(`『 ❌ 』 *L'utente con il numero ${target.split('@')[0]} non è un membro di questo gruppo.*`);
-        }
-        
-        const reason = getReason(m, text, target);
+const time = async (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 
-        if (target === conn.user.jid) {
-            return m.reply('『 ‼️ 』 *Perche vorresti warnare il bot negretto????*');
-        }
-        if (global.owner.some(owner => owner[0] === target.split('@')[0])) {
-            return m.reply('🤨 A chi vuoi warnare scs???');
-        }
+// thumbnail (fetch FIX)
+const getThumb = async () =>
+  Buffer.from(
+    await (await fetch('https://qu.ax/fmHdc.png')).arrayBuffer()
+  )
 
-        const user = getUserData(target);
-        if (!user.warns) user.warns = {};
-        if (typeof user.warns[m.chat] !== 'number') user.warns[m.chat] = 0;
+let handler = async (m, { conn, text, command }) => {
 
-        user.warns[m.chat] += 1;
-        const remainingWarns = user.warns[m.chat];
-        if (remainingWarns >= 3) {
-            user.warns[m.chat] = 0;
-            await handleRemoval(conn, m, target);
-        } else {
-            await handleWarnMessage(conn, m, target, remainingWarns, reason);
+  // ================= UTENTE =================
+  let who
+  if (m.isGroup)
+    who = m.mentionedJid[0]
+      ? m.mentionedJid[0]
+      : m.quoted
+      ? m.quoted.sender
+      : null
+  else who = m.chat
+
+  if (!who) return
+
+  if (!global.db.data.users[who]) {
+    global.db.data.users[who] = { warn: 0 }
+  }
+
+  let user = global.db.data.users[who]
+
+  // ================= WARN =================
+  if (command === 'warn' || command === 'ammonisci') {
+    const maxWarn = 3
+
+    const prova = {
+      key: {
+        participants: '0@s.whatsapp.net',
+        fromMe: false,
+        id: 'Halo'
+      },
+      message: {
+        locationMessage: {
+          name: '𝐀𝐭𝐭𝐞𝐧𝐳𝐢𝐨𝐧𝐞',
+          jpegThumbnail: await getThumb(),
+          vcard: `BEGIN:VCARD
+VERSION:3.0
+N:Sy;Bot;;;
+FN:y
+item1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}
+item1.X-ABLabel:Ponsel
+END:VCARD`
         }
-    } catch (error) {
-        console.error('Errore nell\'handler warn:', error);
-        return m.reply(`${global.errore}`);
+      },
+      participant: '0@s.whatsapp.net'
     }
-};
 
-function getTargetUser(m, text) {
-    if (m.isGroup) {
-        return m.mentionedJid?.[0] || 
-               (m.quoted?.sender) || 
-               (text?.trim() && parseUserFromText(text.trim()));
+    const reason = text ? `❓ » ${text.replace(m.sender, '')}` : ''
+
+    if (user.warn < maxWarn - 1) {
+      user.warn++
+      await conn.reply(
+        m.chat,
+        `👤 » @${who.split('@')[0]}\n⚠️ » *${user.warn} / ${maxWarn}*\n${reason}`,
+        prova,
+        { mentions: [who] }
+      )
+    } else {
+      user.warn = 0
+      await conn.reply(
+        m.chat,
+        '𝐔𝐭𝐞𝐧𝐭𝐞 𝐫𝐢𝐦𝐨𝐬𝐬𝐨 𝐝𝐨𝐩𝐨 𝟑 𝐚𝐯𝐯𝐞𝐫𝐭𝐢𝐦𝐞𝐧𝐭𝐢',
+        prova
+      )
+      await time(1000)
+      await conn.groupParticipantsUpdate(m.chat, [who], 'remove')
     }
-    return m.chat;
-}
+  }
 
-function parseUserFromText(text) {
-    const cleaned = text.replace(/@/g, '').replace(/\s+/g, '');
-    return cleaned.includes('@') ? cleaned : `${cleaned}@s.whatsapp.net`;
-}
-function getReason(m, text, target) {
-    const targetId = target.split('@')[0];
-    const regex = new RegExp(`@?${targetId}`, 'g');
-    const reason = text.replace(regex, '').trim();
-    return reason || 'Non specificato ma meritato';
-}
+  // ================= UNWARN =================
+  if (command === 'unwarn' || command === 'delwarn') {
+    if (user.warn > 0) {
+      user.warn--
 
-function getUserData(userId) {
-    if (!global.db.data.users[userId]) {
-        global.db.data.users[userId] = {
-            warns: {}
-        };
+      const prova = {
+        key: {
+          participants: '0@s.whatsapp.net',
+          fromMe: false,
+          id: 'Halo'
+        },
+        message: {
+          locationMessage: {
+            name: '𝐀𝐭𝐭𝐞𝐧𝐳𝐢𝐨𝐧𝐞',
+            jpegThumbnail: await getThumb(),
+            vcard: `BEGIN:VCARD
+VERSION:3.0
+N:Sy;Bot;;;
+FN:y
+item1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}
+item1.X-ABLabel:Ponsel
+END:VCARD`
+          }
+        },
+        participant: '0@s.whatsapp.net'
+      }
+
+      await conn.reply(
+        m.chat,
+        `👤 » @${who.split('@')[0]}\n⚠️ » *${user.warn} / 3*`,
+        prova,
+        { mentions: [who] }
+      )
+    } else {
+      m.reply('𝐋’𝐮𝐭𝐞𝐧𝐭𝐞 𝐦𝐞𝐧𝐳𝐢𝐨𝐧𝐚𝐭𝐨 𝐧𝐨𝐧 𝐡𝐚 𝐚𝐯𝐯𝐞𝐫𝐭𝐢𝐦𝐞𝐧𝐭𝐢.')
     }
-    return global.db.data.users[userId];
-}
+  }
 
-function createUsageMessage(usedPrefix, command) {
-    return `
-    ㅤㅤ⋆｡˚『 ╭ \`WARN\` ╯ 』˚｡⋆\n╭
-│  『 📋 』 _*METODI DISPONIBILI:*_
-│•  *\`Menziona:\`* *${usedPrefix + command} @utente*
-│•  *\`Rispondi:\`* *Quotando un msg*
-│•  *\`Numero:\`* *${usedPrefix + command} 393514357738*
-│
-*╰⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*`;
-}
-
-async function handleWarnMessage(conn, m, target, remainingWarns, reason) {
-    const username = target.split('@')[0];
-    const groupMeta = await conn.groupMetadata(m.chat);
-    const groupName = groupMeta.subject;
-
-    const emoji = remainingWarns === 1 ? '⚠️' : '🔔';
-    
-    const message = `『 ${emoji} 』 @${username}\n- _*Hai ricevuto un avvertimento*_
-- *\`Motivo:\`* *${reason}*
-- *\`Avvertimenti: ${remainingWarns}/3\`*`;
-    
-    const fkontak = await createUserFkontak(conn, target);
-    
-    await m.reply(message, null, { 
-        mentions: [target],
-        quoted: fkontak
-    });
-}
-
-async function handleRemoval(conn, m, target) {
-    const username = target.split('@')[0];
-    const message = `『 🫄🏿 』 \`io ti avevo avvertito, ora sei arrivato a tre e non puoi piu redimerti, ciao ciao negro\` @${username}`;
-    
-    const fkontak = await createUserFkontak(conn, target);
-
-    await m.reply(message, null, { 
-        mentions: [target],
-        quoted: fkontak
-    });
-    
-    await conn.groupParticipantsUpdate(m.chat, [target], 'remove');
-}
-
-async function createUserFkontak(conn, target) {
-    try {
-        let username = target.split('@')[0];
-        
-        try {
-            const contact = await conn.onWhatsApp(target);
-            if (contact[0]?.notify) {
-                username = contact[0].notify;
-            }
-        } catch {}
-        
-        return {
-            key: {
-                participants: '0@s.whatsapp.net',
-                remoteJid: 'status@broadcast',
-                fromMe: false,
-                id: 'Halo'
-            },
-            message: {
-                contactMessage: {
-                    vcard: `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:${username}\nitem1.TEL;waid=${target.split('@')[0]}:${target.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`
-                }
-            },
-            participant: '0@s.whatsapp.net'
-        };
-    } catch (error) {
-        return null;
+  // ================= RESETWARN =================
+  if (command === 'resetwarn') {
+    if (user.warn === 0) {
+      return m.reply('ℹ️ L’utente non ha warn da resettare.')
     }
+
+    user.warn = 0
+
+    await conn.reply(
+      m.chat,
+      `✅ Tutti i warn di @${who.split('@')[0]} sono stati *resettati*`,
+      m,
+      { mentions: [who] }
+    )
+  }
 }
 
+handler.help = ['warn', 'ammonisci', 'unwarn', 'delwarn', 'resetwarn']
+handler.command = ['warn', 'ammonisci', 'unwarn', 'delwarn', 'resetwarn']
+handler.group = true
+handler.admin = true
+handler.botAdmin = true
 
-handler.command = ['avverti', 'warn', 'avvertimento'];
-handler.group = true;
-handler.admin = true;
-handler.botAdmin = true;
-
-export default handler;
+export default handler
