@@ -1,89 +1,46 @@
 const handler = async (m, { conn }) => {
-    try {
-        const metadata = await conn.groupMetadata(m.chat);
-        const groupName = metadata.subject;
-        const inviteCode = await conn.groupInviteCode(m.chat);
-        const linkgruppo = 'https://chat.whatsapp.com/' + inviteCode;
-        let ppUrl;
-        
-        try {
-            ppUrl = await conn.profilePictureUrl(m.chat, 'image');
-        } catch {
-            ppUrl = 'https://i.ibb.co/3Fh9V6p/avatar-group-default.png';
-        }
+  const metadata = await conn.groupMetadata(m.chat)
+  const inviteCode = await conn.groupInviteCode(m.chat)
 
-        const linkCard = {
-            image: { url: ppUrl },
-            title: `『 🔗 』 *\`link gruppo:\`*`,
-            body: `- *${metadata.participants.length} Membri* \n- *${linkgruppo}*`,
-            footer: '',
-            buttons: [
-                {
-                    name: 'cta_copy',
-                    buttonParamsJson: JSON.stringify({
-                        display_text: '📎 Copia Link',
-                        copy_code: linkgruppo
-                    })
-                },
-            ]
-        }
-        await conn.sendMessage(
-            m.chat,
-            {
-                text: `*${groupName}*`,
-                footer: '𝓿𝓪𝓻𝓮𝓫𝓸𝓽',
-                cards: [linkCard]
-            },
-            { quoted: m }
-        )
+  // Foto profilo dell'utente
+  let pp
+  try {
+    pp = await conn.profilePictureUrl(m.sender, 'image')
+  } catch {
+    pp = 'https://i.ibb.co/3Fh9V6p/avatar.png' // fallback
+  }
 
-    } catch (error) {
-        console.error('Errore invio messaggio link:', error);
-        const metadata = await conn.groupMetadata(m.chat);
-        const groupName = metadata.subject;
-        const inviteCode = await conn.groupInviteCode(m.chat);
-        const linkgruppo = 'https://chat.whatsapp.com/' + inviteCode;
-        let ppUrl;
-        
-        try {
-            ppUrl = await conn.profilePictureUrl(m.chat, 'image');
-        } catch {
-            ppUrl = null;
-        }
+  const text = `
+╭─〔 🔗 *LINK DEL GRUPPO* 🔗 〕─╮
+│
+│ 🏷 *Nome:* ${metadata.subject}
+│
+│ 🌐 *Link d’invito:*
+│ https://chat.whatsapp.com/${inviteCode}
+│
+╰────────────────────╯
+`
 
-        const interactiveButtons = [
-            {
-                name: "cta_copy",
-                buttonParamsJson: JSON.stringify({
-                    display_text: "Copia link 📎",
-                    id: linkgruppo,
-                    copy_code: linkgruppo
-                })
-            },
-        ];
-
-        const messageText = `*\`Link gruppo:\`*\n- *${groupName}*\n- *${linkgruppo}*`;
-
-        if (ppUrl) {
-            await conn.sendMessage(m.chat, {
-                image: { url: ppUrl },
-                caption: messageText,
-                interactiveButtons
-            }, { quoted: m });
-        } else {
-            const interactiveMessage = {
-                text: messageText,
-                interactiveButtons
-            };
-            await conn.sendMessage(m.chat, interactiveMessage, { quoted: m });
-        }
+  await conn.sendMessage(m.chat, {
+    text,
+    footer: 'Link del gruppo generato dal bot 🤖',
+    contextInfo: {
+      externalAdReply: {
+        title: 'Link del gruppo',
+        body: metadata.subject,
+        thumbnailUrl: pp,
+        mediaType: 1,
+        renderLargerThumbnail: false,
+        showAdAttribution: false
+      }
     }
-};
+  }, { quoted: m })
+}
 
-handler.help = ['link'];
-handler.tags = ['gruppo'];
-handler.command = /^link$/i;
-handler.group = true;
-handler.botAdmin = true;
+handler.help = ['linkgroup']
+handler.tags = ['group']
+handler.command = /^link(gro?up)?$/i
+handler.group = true
+handler.botAdmin = true
 
-export default handler;
+export default handler
