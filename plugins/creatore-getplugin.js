@@ -34,7 +34,7 @@ const handler = async (m, { conn, isROwner, usedPrefix, command, text }) => {
 
 handler.help = ['getplugin'];
 handler.tags = ['creatore'];
-handler.command = ['getplugin', 'plugin'];
+handler.command = ['getplugin', 'plugin', 'pl'];
 handler.rowner = true;
 
 export default handler;
