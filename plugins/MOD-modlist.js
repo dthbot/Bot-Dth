@@ -30,6 +30,6 @@ handler.help = ['modlist'];
 handler.tags = ['owner'];
 handler.command = ['modlist'];
 handler.group = true;
-handler.owner = true;
+handler.admin = true;
 
 export default handler;
