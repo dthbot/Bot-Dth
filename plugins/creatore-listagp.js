@@ -46,7 +46,7 @@ const handler = async (m, { conn }) => {
 };
 handler.help = ['groups', 'grouplist'];
 handler.tags = ['creatore'];
-handler.command = /^(groups|grouplist|listadegruppo|gruppilista|listagruppi|listgroup)$/i;
+handler.command = /^(groups|grouplist|listadegruppo|gruppilista|gruppidth|listagruppi|listgroup)$/i;
 handler.rowner = true;
 handler.private = true;
 export default handler;
