@@ -1,4 +1,4 @@
-const handler = async (m, { conn }) => {
+const handler = async (m, { conn, text }) => {
   const users = global.db.data.users || {};
 
   let mods = Object.entries(users)
@@ -8,10 +8,15 @@ const handler = async (m, { conn }) => {
   if (mods.length === 0)
     return m.reply('⚠️ Nessun moderatore trovato.');
 
-  let text = `
+  // Messaggio personalizzato opzionale
+  let customMsg = text
+    ? `📝 *${text}*\n\n`
+    : '';
+
+  let caption = `
 👑 *LISTA MODERATORI* 👑
 
-📊 Totale: ${mods.length}
+${customMsg}📊 Totale: ${mods.length}
 
 ${mods.map((jid, i) => `${i + 1}. @${jid.split('@')[0]}`).join('\n')}
 `.trim();
@@ -19,17 +24,17 @@ ${mods.map((jid, i) => `${i + 1}. @${jid.split('@')[0]}`).join('\n')}
   await conn.sendMessage(
     m.chat,
     {
-      text,
+      text: caption,
       mentions: mods
     },
     { quoted: m }
   );
 };
 
-handler.help = ['modlist'];
+handler.help = ['modlist (messaggio)'];
 handler.tags = ['owner'];
 handler.command = ['modlist'];
 handler.group = true;
-handler.admin = true;
+handler.admin = true; 
 
 export default handler;
