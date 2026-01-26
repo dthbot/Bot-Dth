@@ -138,21 +138,24 @@ if (!methodCodeQR && !methodCode && !fs.existsSync(`./${authFile}/creds.json`)) 
         const violet4 = chalk.hex('#5B2C6F');
         const softText = chalk.hex('#D7BDE2');
 
-        const a = violet1('╭━━━━━━━━━━━━━• ✧˚🩸 varebot 🕊️˚✧ •━━━━━━━━━━━━━');
-        const b = violet1('╰━━━━━━━━━━━━━• ☾⋆₊✧ 𝓿𝓪𝓻𝓮𝓫𝓸𝓽 ✧₊⋆☽ •━━━━━━━━━━━━━');
-        const linea = violet2('   ✦━━━━━━✦✦━━━━━━༺༻━━━━━━༺༻━━━━━━✦✦━━━━━━✦');
-        const sm = violet3('SELEZIONE METODO DI ACCESSO ✦');
-        const qr = violet4(' ┌─⭓') + ' ' + chalk.bold.hex('#D2B4DE')('1. Scansione con QR Code');
-        const codice = violet4(' └─⭓') + ' ' + chalk.bold.hex('#D2B4DE')('2. Codice di 8 cifre');
-        const istruzioni = [
-            violet4(' ┌─⭓') + softText.italic(' Digita solo il numero corrispondente.'),
-            violet4(' └─⭓') + softText.italic(' Premi Invio per confermare.'),
-            softText.italic(''),
-            violet1.italic('                   by sam'),
-        ];
-        const prompt = chalk.hex('#BB8FCE').bold('\n⌯ Inserisci la tua scelta ---> ');
+        const a = violet1('╭━━━━━━━━━━━━━• [ SECURE NODE ONLINE ] •━━━━━━━━━━━━━');
+const b = violet1('╰━━━━━━━━━━━━━• [ TERMINAL LOCKED ] •━━━━━━━━━━━━━');
+const linea = violet2('   ━━━━━━━━▓▓━━━━━━━▒━━━━━━━▒━━━━━━━▓▓━━━━━━━');
+const sm = violet3('>> AUTHENTICATION GATE');
 
-        opzione = await question(`\n
+const qr = violet4(' ┌─⭓') + ' ' + chalk.bold.hex('#D2B4DE')('1. QR HANDSHAKE');
+const codice = violet4(' └─⭓') + ' ' + chalk.bold.hex('#D2B4DE')('2. NUMERIC TOKEN');
+
+const istruzioni = [
+    violet4(' ┌─⭓') + softText.italic(' Select a valid access vector.'),
+    violet4(' └─⭓') + softText.italic(' Confirm input with ENTER.'),
+    softText.italic(''),
+    violet1.italic('             kernel loaded • deadly'),
+];
+
+const prompt = chalk.hex('#BB8FCE').bold('\n⌯ input@node ➤ ');
+
+opzione = await question(`\n
 ${a}
 
           ${sm}
@@ -167,8 +170,8 @@ ${istruzioni.join('\n')}
 ${b}
 ${prompt}`);
 
-        if (!/^[1-2]$/.test(opzione)) {
-            console.log(`\n${chalk.hex('#E74C3C').bold('✖ INPUT NON VALIDO')}
+if (!/^[1-2]$/.test(opzione)) {
+    console.log(`\n${chalk.hex('#E74C3C').bold('[ INVALID PAYLOAD ]')}
 
 ${chalk.hex('#F5EEF8')('   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')}
 ${chalk.hex('#EC7063').bold('⚠️ Sono ammessi solo i numeri')} ${chalk.bold.green('1')} ${chalk.hex('#EC7063').bold('o')} ${chalk.bold.green('2')}
