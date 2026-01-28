@@ -1,4 +1,4 @@
-// gp-cur.js — Last.fm CUR + SETUSER (Mood & Popularity + Buttons)
+// gp-cur.js — Last.fm CUR + SETUSER (Mood, Popolarità, Bottoni, Lyrics)
 import fetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
@@ -12,6 +12,7 @@ if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, '{}', 'utf8')
 
 const LASTFM_API_KEY = '36f859a1fc4121e7f0e931806507d5f9'
 
+// ================= UTILS =================
 const loadUsers = () => JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'))
 const saveUsers = (u) => fs.writeFileSync(USERS_FILE, JSON.stringify(u, null, 2))
 const getUser = (id) => loadUsers()[id] || null
@@ -30,6 +31,7 @@ async function fetchNoCache(url) {
   }
 }
 
+// ================= LAST.FM =================
 async function getRecentTrack(user) {
   const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${user}&api_key=${LASTFM_API_KEY}&format=json&limit=1`
   const json = await fetchNoCache(url)
@@ -48,6 +50,19 @@ async function getArtistInfo(artist) {
   return json?.artist
 }
 
+// ================= LYRICS =================
+async function getLyrics(artist, track) {
+  try {
+    const url = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(track)}`
+    const res = await fetch(url)
+    const json = await res.json()
+    return json?.lyrics || null
+  } catch {
+    return null
+  }
+}
+
+// ================= STYLE =================
 function popularityBar(listeners) {
   const max = 2000000
   let level = Math.min(10, Math.max(1, Math.round((listeners / max) * 10)))
@@ -62,8 +77,56 @@ function popularityLabel(listeners) {
   return '🌍 HIT'
 }
 
+// ================= RISPOSTE BOTTONI =================
+const likeReplies = [
+  '🔥 Gusto musicale approvato.',
+  '😌 Questa va dritta in repeat.',
+  '🎧 Scelta di livello superiore.',
+  '🖤 Vibe rispettata.',
+  '💿 Questa spacca, confermato.'
+]
+
+const dislikeReplies = [
+  '💀 Skippata senza pietà.',
+  '😬 Non era il momento giusto.',
+  '🗑️ Rimossa dal cervello.',
+  '🙉 Orecchie in sciopero.',
+  '🚫 Bannata dall’anima.'
+]
+
+const rand = (arr) => arr[Math.floor(Math.random() * arr.length)]
+
+// ================= HANDLER =================
 const handler = async (m, { conn, usedPrefix, command, text }) => {
 
+  // ===== BOTTONI =====
+  if (m.message?.buttonsResponseMessage) {
+    const id = m.message.buttonsResponseMessage.selectedButtonId
+
+    if (id.startsWith('like_')) {
+      const track = id.replace('like_', '')
+      return m.reply(`👍 *${track}*\n${rand(likeReplies)}`)
+    }
+
+    if (id.startsWith('dislike_')) {
+      const track = id.replace('dislike_', '')
+      return m.reply(`👎 *${track}*\n${rand(dislikeReplies)}`)
+    }
+
+    if (id.startsWith('lyrics_')) {
+      const [, data] = id.split('lyrics_')
+      const [artist, track] = data.split('|||')
+      const lyrics = await getLyrics(artist, track)
+
+      return m.reply(
+        lyrics
+          ? `📜 *${track}* — ${artist}\n\n${lyrics.slice(0, 3500)}`
+          : '❌ Testo non trovato 😔'
+      )
+    }
+  }
+
+  // ===== SETUSER =====
   if (command === 'setuser') {
     const username = text.trim()
     if (!username) return m.reply(`❌ Usa: ${usedPrefix}setuser <username>`)
@@ -71,6 +134,7 @@ const handler = async (m, { conn, usedPrefix, command, text }) => {
     return m.reply(`✅ Username Last.fm *${username}* salvato!`)
   }
 
+  // ===== CUR =====
   if (command === 'cur') {
     const targetId = m.mentionedJid?.[0] || m.sender
     const user = getUser(targetId)
@@ -109,7 +173,6 @@ const handler = async (m, { conn, usedPrefix, command, text }) => {
 
     const displayName = '@' + targetId.split('@')[0]
 
-    // 🔥 MESSAGGIO HACKER DIVERTENTE
     const caption = `
 🖥️ sto hackerando Last.fm...
 █▒▒▒▒▒▒▒▒▒ 12%
@@ -132,12 +195,17 @@ ${popularityBar(listeners)}
     const buttons = [
       {
         buttonId: `like_${trackName}`,
-        buttonText: { displayText: '👍 Ti piace?' },
+        buttonText: { displayText: '👍 Ti piace' },
         type: 1
       },
       {
         buttonId: `dislike_${trackName}`,
-        buttonText: { displayText: '👎 Non ti piace?' },
+        buttonText: { displayText: '👎 Non ti piace' },
+        type: 1
+      },
+      {
+        buttonId: `lyrics_${artistName}|||${trackName}`,
+        buttonText: { displayText: '📜 Testo' },
         type: 1
       }
     ]
