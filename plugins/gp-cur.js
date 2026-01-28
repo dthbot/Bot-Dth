@@ -169,12 +169,12 @@ ${popularityBar(listeners)}
     const buttons = [
       {
         buttonId: `like_${trackName}`,
-        buttonText: { displayText: '👍 Ti piace?' },
+        buttonText: { displayText: '👍 Ti piace' },
         type: 1
       },
       {
         buttonId: `dislike_${trackName}`,
-        buttonText: { displayText: '👎 Non ti piace?' },
+        buttonText: { displayText: '👎 Non ti piace' },
         type: 1
       }
     ]
