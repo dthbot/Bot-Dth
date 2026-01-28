@@ -31,16 +31,16 @@ return null
 }
 
 async function getRecentTrack(user) {
-const url = https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${user}&api_key=${LASTFM_API_KEY}&format=json&limit=1
+const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${user}&api_key=${LASTFM_API_KEY}&format=json&limit=1
 const json = await fetchNoCache(url)
 return json?.recenttracks?.track?.[0]
-}
+}`
 
 async function getTrackInfo(user, artist, track) {
-const url = https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${LASTFM_API_KEY}&artist=${encodeURIComponent(artist)}&track=${encodeURIComponent(track)}&username=${user}&format=json
+const url = `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${LASTFM_API_KEY}&artist=${encodeURIComponent(artist)}&track=${encodeURIComponent(track)}&username=${user}&format=json
 const json = await fetchNoCache(url)
 return json?.track
-}
+}`
 
 async function getArtistInfo(artist) {
 const url = https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&api_key=${LASTFM_API_KEY}&artist=${encodeURIComponent(artist)}&format=json
