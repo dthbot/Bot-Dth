@@ -43,10 +43,10 @@ return json?.track
 }`
 
 async function getArtistInfo(artist) {
-const url = https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&api_key=${LASTFM_API_KEY}&artist=${encodeURIComponent(artist)}&format=json
+const url = `https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&api_key=${LASTFM_API_KEY}&artist=${encodeURIComponent(artist)}&format=json
 const json = await fetchNoCache(url)
 return json?.artist
-}
+}`
 
 function popularityBar(listeners) {
 const max = 2000000
