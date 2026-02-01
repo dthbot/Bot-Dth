@@ -46,13 +46,30 @@ END:VCARD`
   // ================= WARN MOD =================
   if (command === 'warnmod') {
     user.warn = (user.warn || 0) + 1
+
+    // messaggio warn
     await conn.reply(
       m.chat,
       `⚠️ @${who.split('@')[0]} è stato ammonito da un moderatore\n` +
-      `📝 Numero totale di warn: ${user.warn}`,
+      `📝 Numero totale di warn: ${user.warn}/3`,
       prova,
       { mentions: [who] }
     )
+
+    // kick automatico al 3° warn
+    if (user.warn >= 3) {
+      await conn.reply(
+        m.chat,
+        `🚫 @${who.split('@')[0]} ha raggiunto *3 WARN*\n❌ Rimosso dal gruppo`,
+        prova,
+        { mentions: [who] }
+      )
+
+      await conn.groupParticipantsUpdate(m.chat, [who], 'remove')
+
+      // reset warn dopo il kick
+      user.warn = 0
+    }
   }
 
   // ================= UNWARN MOD =================
