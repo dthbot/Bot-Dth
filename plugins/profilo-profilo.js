@@ -245,6 +245,6 @@ ${marriages[who] ? `│  『 💕 』 \`Sposato:\`\n│      *⤷*  ${partnerMen
 
 handler.help = ['profilo']
 handler.tags = ['info', 'profilo']
-handler.command = /^(profilo|profile)$/i
+handler.command = /^(profilo|profile|info)$/i
 handler.register = true
 export default handler
