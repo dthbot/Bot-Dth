@@ -1,12 +1,12 @@
-//antinuke by axtral
+//antinuke modificato da axtral
 const handler = m => m;
 
-// Lista autorizzati
+// Lista admin autorizzati
 const registeredAdmins = [
-  '212773631903@s.whatsapp.net',//nome
+  '212773631903@s.whatsapp.net',//
 
                  //BOT//
-  '212786303664@s.whatsapp.net',//nome
+  '212786303664@s.whatsapp.net',//botmio
 ];
 
 // Owner del bot
@@ -41,7 +41,7 @@ async function handlePromotion(message) {
 
     await conn.groupSettingUpdate(groupId, 'announcement');
 
-    const text = 🚨 ANTI-NUKE ATTIVO\n\n👤 @${promoter.split('@')[0]} ha promosso @${newAdmin.split('@')[0]}.\n\n🔒 Gruppo chiuso per possibile tentativo di rubare/svt.\n\n👑 Owner avvisati:\n${BOT_OWNERS.map(x => @${x.split('@')[0]}).join('\n')}\n\n⚠️ Sistema di sicurezza attivo;
+    const text = `🚨 ANTI-NUKE ATTIVO\n\n👤 @${promoter.split('@')[0]} ha promosso @${newAdmin.split('@')[0]}.\n\n🔒 Gruppo chiuso per possibile tentativo di rubare/svt.\n\n👑 Owner avvisati:\n${BOT_OWNERS.map(x => `@${x.split('@')[0]}`).join('\n')}\n\n⚠️ Sistema di sicurezza attivo`;
 
     await conn.sendMessage(groupId, {
       text,
@@ -80,7 +80,7 @@ async function handleDemotion(message) {
 
     await conn.groupSettingUpdate(groupId, 'announcement');
 
-    const text = 🚨 ANTI-NUKE ATTIVO\n\n👤 @${demoter.split('@')[0]} ha retrocesso @${demoted.split('@')[0]}.\n\n🔒 Gruppo chiuso per possibile tentativo di rubare/svt.\n\n👑 Owner avvisati:\n${BOT_OWNERS.map(x => @${x.split('@')[0]}).join('\n')}\n\n⚠️ Sistema di sicurezza attivo;
+    const text = `🚨 ANTI-NUKE ATTIVO\n\n👤 @${demoter.split('@')[0]} ha retrocesso @${demoted.split('@')[0]}.\n\n🔒 Gruppo chiuso per possibile tentativo di rubare/svt.\n\n👑 Owner avvisati:\n${BOT_OWNERS.map(x => `@${x.split('@')[0]}`).join('\n')}\n\n⚠️ Sistema di sicurezza attivo`;
 
     await conn.sendMessage(groupId, {
       text,
