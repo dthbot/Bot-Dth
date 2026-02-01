@@ -53,18 +53,16 @@ ${lines.map(l => `│ ${l}`).join('\n')}
 
     /* ====== ANTINUKE ====== */
     case 'antinuke':
-        if (!isOwner && !isROwner) {
-          result.status = '『 ❌ 』 Richiede privilegi di proprietario';
-          break;
-        }
-        if (chat.antinuke=== isEnable) {
-          result.status = `『 ⚠️ 』 Già ${isEnable ? 'attivo' : 'disattivato'}`;
-          break;
-        }
-        chat.antinuke = isEnable;
-        result.status = `『 ✅ 』 ${isEnable ? 'Attivato' : 'Disattivato'}`;
-        result.success = true;
-        break;
+      if (!isOwner && !isROwner) return m.reply(noOwner)
+      if (chat.antinuke === isEnable)
+        return m.reply(box('💣 ANTINUKE', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      chat.antinuke = isEnable
+      result = box('💣 ANTINUKE', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Protezione anti-nuke'
+      ])
+      break
 
     /* ====== ANTIGORE ====== */
     case 'antigore':
