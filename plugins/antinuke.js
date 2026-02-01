@@ -1,39 +1,25 @@
-//antinuke modificato da axtral
 const handler = m => m;
 
-// Lista admin autorizzati
+//Lista autorizzati 
 const registeredAdmins = [
-  '212773631903@s.whatsapp.net',//
-
-                 //BOT//
-  '212786303664@s.whatsapp.net',//botmio
+  '212773631903@s.whatsapp.net',//nome
+  '@s.whatsapp.net',//nome
 ];
 
-// Owner del bot
-const BOT_OWNERS = [
-  '212773631903@s.whatsapp.net',//io
-
-];
-
-async function handlePromotion(message) {
+async function handlePromotion(message, conn, participants) {
   try {
     const newAdmin = message.messageStubParameters[0];
     const promoter = message.participant;
     const groupId = message.chat;
-    const botJid = conn.user.jid;
 
+    const botJid = conn.user.id.split(':')[0] + '@s.whatsapp.net';
+    const BOT_OWNERS = global.owner.map(o => o[0] + '@s.whatsapp.net');
     const allowed = [botJid, ...BOT_OWNERS, ...registeredAdmins];
 
     if (allowed.includes(promoter)) return;
     if (newAdmin === botJid) return;
 
-    const metadata = await conn.groupMetadata(groupId);
-    const currentAdmins = metadata.participants
-      .filter(p => p.admin)
-      .map(p => p.id)
-      .filter(id => !allowed.includes(id));
-
-    const toDemote = [...new Set([...currentAdmins, promoter, newAdmin])];
+    const toDemote = [promoter, newAdmin].filter(jid => !allowed.includes(jid));
 
     if (toDemote.length > 0) {
       await conn.groupParticipantsUpdate(groupId, toDemote, 'demote');
@@ -54,25 +40,20 @@ async function handlePromotion(message) {
   }
 }
 
-async function handleDemotion(message) {
+async function handleDemotion(message, conn, participants) {
   try {
     const demoted = message.messageStubParameters[0];
     const demoter = message.participant;
     const groupId = message.chat;
-    const botJid = conn.user.jid;
 
+    const botJid = conn.user.id.split(':')[0] + '@s.whatsapp.net';
+    const BOT_OWNERS = global.owner.map(o => o[0] + '@s.whatsapp.net');
     const allowed = [botJid, ...BOT_OWNERS, ...registeredAdmins];
 
     if (allowed.includes(demoter)) return;
     if (demoted === botJid) return;
 
-    const metadata = await conn.groupMetadata(groupId);
-    const currentAdmins = metadata.participants
-      .filter(p => p.admin)
-      .map(p => p.id)
-      .filter(id => !allowed.includes(id));
-
-    const toDemote = [...new Set([...currentAdmins, demoter, demoted])];
+    const toDemote = [demoter, demoted].filter(jid => !allowed.includes(jid));
 
     if (toDemote.length > 0) {
       await conn.groupParticipantsUpdate(groupId, toDemote, 'demote');
@@ -93,11 +74,17 @@ async function handleDemotion(message) {
   }
 }
 
-handler.all = async function(m) {
+handler.all = async function (m, { conn, participants, isBotAdmin }) {
+  if (!m.isGroup) return;
+  if (!isBotAdmin) return;
+
+  const chat = global.db.data.chats[m.chat] || {};
+  if (!chat.antinuke) return;
+
   if (m.messageStubType === 29) { 
-    await handlePromotion(m);
+    await handlePromotion(m, conn, participants);
   } else if (m.messageStubType === 30) { 
-    await handleDemotion(m);
+    await handleDemotion(m, conn, participants);
   }
 };
 
