@@ -51,6 +51,19 @@ ${lines.map(l => `│ ${l}`).join('\n')}
       ])
       break
 
+    /* ====== ANTINUKE ====== */
+    case 'antinuke':
+      if (!isOwner && !isROwner) return m.reply(noOwner)
+      if (bot.antinuke === isEnable)
+        return m.reply(box('💣 ANTINUKE', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      bot.antinuke = isEnable
+      result = box('💣 ANTINUKE', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Protezione anti-nuke'
+      ])
+      break
+
     /* ====== ANTIGORE ====== */
     case 'antigore':
       if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin)
@@ -61,6 +74,19 @@ ${lines.map(l => `│ ${l}`).join('\n')}
       result = box('🚫 ANTIGORE', [
         `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
         'Blocca contenuti violenti'
+      ])
+      break
+
+    /* ====== ANTITRAVA ====== */
+    case 'antitrava':
+      if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin)
+      if (chat.antitrava === isEnable)
+        return m.reply(box('🧱 ANTITRAVA', ['Già ' + (isEnable ? 'attivo' : 'disattivo')]))
+
+      chat.antitrava = isEnable
+      result = box('🧱 ANTITRAVA', [
+        `Stato: ${isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'}`,
+        'Blocca messaggi crash/trava'
       ])
       break
 
