@@ -16,15 +16,14 @@ const handler = async (m, { conn, usedPrefix = '.' }) => {
 ➤ AntiSpam
 ➤ AntiTrava
 ➤ AntiNuke
-➤ AntiBestemmie
+➤ AntiPrivato
 ➤ AntiBot
 
 🔒 *CONTROLLO GRUPPO*
 ➤ SoloAdmin
-➤ AntiMedia
+➤ AntiGore
+➤ AntiPorno
 ➤ AntiLink
-➤ AntiTikTok
-➤ AntiInsta
 
 👋 *BENVENUTO*
 ➤ Benvenuto
