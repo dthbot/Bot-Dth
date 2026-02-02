@@ -1,71 +1,57 @@
 import { performance } from 'perf_hooks';
 
 let handler = async (m, { conn, text }) => {
-    let start = `⏳ *Inizio processo di DOX...*`;
-    await m.reply(start);
+    let user = `@${m.sender.split('@')[0]}`;
 
-    // Progressione del "boost" con simulazione
-    await m.reply(`🔍 *Progresso:* ${pickRandom(['10', '20', '30', '40', '50'])}%`);
-    await m.reply(`🔍 *Progresso:* ${pickRandom(['60', '70', '80'])}%`);
-    await m.reply(`🔍 *Progresso:* ${pickRandom(['90', '100'])}%`);
+    await m.reply('⏳ *Inizializzazione modulo DOX...*');
 
-    // Simulazione di velocità
+    const steps = [
+        '█░░░░░░░░░ 10%',
+        '██░░░░░░░░ 20%',
+        '███░░░░░░░ 30%',
+        '████░░░░░░ 40%',
+        '█████░░░░░ 50%',
+        '██████░░░░ 60%',
+        '███████░░░ 70%',
+        '████████░░ 80%',
+        '█████████░ 90%',
+        '██████████ 100%'
+    ];
+
+    for (let step of steps) {
+        await new Promise(r => setTimeout(r, 400));
+        await m.reply(`🔍 *Analisi dati in corso...*\n${step}`);
+    }
+
     let old = performance.now();
     let neww = performance.now();
     let speed = `${(neww - old).toFixed(2)} ms`;
 
-    // Risultati finali
     let doxeo = `
-*✔️DOX COMPLETATO CON SUCCESSO*\n*Dox By ${user}*
+*✔️ DOX COMPLETATO (SIMULAZIONE)*  
+*Dox By ${user}*
 ━━━━━━━━━━━━━━━━━━━━━
-👤 *Persona doxata:* ${text}
-🌐 *Indirizzo IP:* ${pickRandom([
-        '92.28.211.234',
-        '140.216.58.100',
-        '80.139.134.15',
-        '88.53.127.8',
-        '231.87.85.223',
-    ])}
-🔐 *IPV6:* ${pickRandom([
-        '4e4d:1176:3285:02bb:40c7:bd44:4094:4f37',
-        '806a:9b5d:c5b3:e852:b490:0492:bef9:085b',
-    ])}
-📶 *ISP:* ${pickRandom([
-        'Telecom Italia',
-        'Vodafone',
-        'WINDTRE',
-        'Fastweb',
-        'Tiscali',
-    ])}
-📡 *DNS:* ${pickRandom(['8.8.8.8', '8.8.4.4', '1.1.1.1'])}
-🖥️ *MAC Address:* ${pickRandom([
-        '4A:93:23:18:BA:7F',
-        'F0:1A:30:3B:EA:D1',
-        'AD:7E:2A:FB:81:B3',
-    ])}
-📟 *Router Vendor:* ${pickRandom([
-        'ERICCSON',
-        'Alcatel',
-        'Asus',
-        'Cisco',
-        'Huawei',
-        'Samsung',
-        'IPhone',
-        'Motorola',
-        'Oppo',
-        'Redmi',
-    ])}
+👤 *Target:* ${text || 'Sconosciuto'}
+🌐 *IP:* 192.168.${pickRandom([0,1,2,10,50])}.${pickRandom([1,20,42,69,100])}
+🔐 *IPv6:* fe80::${pickRandom(['1a2b','3c4d','5e6f'])}:${pickRandom(['aa12','bb34','cc56'])}
+📶 *ISP:* ${pickRandom(['FakeNet', 'Mock Telecom', 'Test Provider'])}
+📡 *DNS:* 1.1.1.1
+🖥️ *MAC:* ${pickRandom(['AA:BB:CC:DD:EE:FF','11:22:33:44:55:66'])}
+📟 *Device:* ${pickRandom(['Android', 'iPhone', 'Router WiFi', 'Smart Fridge'])}
 ━━━━━━━━━━━━━━━━━━━━━
-
 🕒 *Tempo di esecuzione:* ${speed}
+
+⚠️ *ATTENZIONE:*  
+Questo risultato è **TOTALMENTE FAKE** ed è solo per **scopo ironico / fun**.
 `.trim();
 
-    m.reply(doxeo, null, { mentions: conn.parseMention(doxeo) });
+    await m.reply(doxeo, null, { mentions: [m.sender] });
 };
 
-handler.help = ['doxear <nome> | <@tag>'];
-handler.tags = ['fun'];
+handler.help = ['dox <nome | @tag>'];
+handler.tags = ['fun', 'troll'];
 handler.command = /^dox$/i;
+
 export default handler;
 
 function pickRandom(list) {
