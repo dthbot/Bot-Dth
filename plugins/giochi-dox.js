@@ -28,7 +28,7 @@ let handler = async (m, { conn, text }) => {
     let speed = `${(neww - old).toFixed(2)} ms`;
 
     let doxeo = `
-*✔️ DOX COMPLETATO (SIMULAZIONE)*  
+*✔️ DOX COMPLETATO*  
 Dox By ${user}
 ━━━━━━━━━━━━━━━━━━━━━
 👤 *Target:* ${text || 'Sconosciuto'}
