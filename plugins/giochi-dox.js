@@ -16,7 +16,7 @@ let handler = async (m, { conn, text }) => {
 
     // Risultati finali
     let doxeo = `
-*✔️DOX COMPLETATO CON SUCCESSO*
+*✔️DOX COMPLETATO CON SUCCESSO*\n*Dox By ${user}*
 ━━━━━━━━━━━━━━━━━━━━━
 👤 *Persona doxata:* ${text}
 🌐 *Indirizzo IP:* ${pickRandom([
