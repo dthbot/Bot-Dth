@@ -29,7 +29,7 @@ let handler = async (m, { conn, text }) => {
 
     let doxeo = `
 *✔️ DOX COMPLETATO (SIMULAZIONE)*  
-*Dox By ${user}*
+Dox By ${user}
 ━━━━━━━━━━━━━━━━━━━━━
 👤 *Target:* ${text || 'Sconosciuto'}
 🌐 *IP:* 192.168.${pickRandom([0,1,2,10,50])}.${pickRandom([1,20,42,69,100])}
@@ -40,9 +40,6 @@ let handler = async (m, { conn, text }) => {
 📟 *Device:* ${pickRandom(['Android', 'iPhone', 'Router WiFi', 'Smart Fridge'])}
 ━━━━━━━━━━━━━━━━━━━━━
 🕒 *Tempo di esecuzione:* ${speed}
-
-⚠️ *ATTENZIONE:*  
-Questo risultato è **TOTALMENTE FAKE** ed è solo per **scopo ironico / fun**.
 `.trim();
 
     await m.reply(doxeo, null, { mentions: [m.sender] });
