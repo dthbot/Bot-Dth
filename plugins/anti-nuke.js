@@ -1,91 +1,88 @@
+//Plugin fatto da Axtral_WiZaRd
 const handler = m => m;
 
-//Lista autorizzati 
+//lista autorizzati 
 const registeredAdmins = [
-  '212773631903@s.whatsapp.net',//nome
-  '@s.whatsapp.net',//nome
+  '212773631903@s.whatsapp.net',
+  '@s.whatsapp.net',
 ];
 
-async function handlePromotion(message, conn, participants) {
-  try {
-    const newAdmin = message.messageStubParameters[0];
-    const promoter = message.participant;
-    const groupId = message.chat;
-
-    const botJid = conn.user.id.split(':')[0] + '@s.whatsapp.net';
-    const BOT_OWNERS = global.owner.map(o => o[0] + '@s.whatsapp.net');
-    const allowed = [botJid, ...BOT_OWNERS, ...registeredAdmins];
-
-    if (allowed.includes(promoter)) return;
-    if (newAdmin === botJid) return;
-
-    const toDemote = [promoter, newAdmin].filter(jid => !allowed.includes(jid));
-
-    if (toDemote.length > 0) {
-      await conn.groupParticipantsUpdate(groupId, toDemote, 'demote');
-    }
-
-    await conn.groupSettingUpdate(groupId, 'announcement');
-
-    const text = `🚨 ANTI-NUKE ATTIVO\n\n👤 @${promoter.split('@')[0]} ha promosso @${newAdmin.split('@')[0]}.\n\n🔒 Gruppo chiuso per possibile tentativo di rubare/svt.\n\n👑 Owner avvisati:\n${BOT_OWNERS.map(x => `@${x.split('@')[0]}`).join('\n')}\n\n⚠️ Sistema di sicurezza attivo`;
-
-    await conn.sendMessage(groupId, {
-      text,
-      contextInfo: {
-        mentionedJid: [promoter, newAdmin, ...BOT_OWNERS],
-      },
-    });
-  } catch (error) {
-    console.error('Errore in handlePromotion:', error);
-  }
-}
-
-async function handleDemotion(message, conn, participants) {
-  try {
-    const demoted = message.messageStubParameters[0];
-    const demoter = message.participant;
-    const groupId = message.chat;
-
-    const botJid = conn.user.id.split(':')[0] + '@s.whatsapp.net';
-    const BOT_OWNERS = global.owner.map(o => o[0] + '@s.whatsapp.net');
-    const allowed = [botJid, ...BOT_OWNERS, ...registeredAdmins];
-
-    if (allowed.includes(demoter)) return;
-    if (demoted === botJid) return;
-
-    const toDemote = [demoter, demoted].filter(jid => !allowed.includes(jid));
-
-    if (toDemote.length > 0) {
-      await conn.groupParticipantsUpdate(groupId, toDemote, 'demote');
-    }
-
-    await conn.groupSettingUpdate(groupId, 'announcement');
-
-    const text = `🚨 ANTI-NUKE ATTIVO\n\n👤 @${demoter.split('@')[0]} ha retrocesso @${demoted.split('@')[0]}.\n\n🔒 Gruppo chiuso per possibile tentativo di rubare/svt.\n\n👑 Owner avvisati:\n${BOT_OWNERS.map(x => `@${x.split('@')[0]}`).join('\n')}\n\n⚠️ Sistema di sicurezza attivo`;
-
-    await conn.sendMessage(groupId, {
-      text,
-      contextInfo: {
-        mentionedJid: [demoter, demoted, ...BOT_OWNERS],
-      },
-    });
-  } catch (error) {
-    console.error('Errore in handleDemotion:', error);
-  }
-}
-
-handler.all = async function (m, { conn, participants, isBotAdmin }) {
+handler.before = async function (m, { conn, participants, isBotAdmin }) {
   if (!m.isGroup) return;
   if (!isBotAdmin) return;
 
-  const chat = global.db.data.chats[m.chat] || {};
-  if (!chat.antinuke) return;
+  const chat = global.db.data.chats[m.chat];
+  if (!chat?.antinuke) return;
 
-  if (m.messageStubType === 29) { 
-    await handlePromotion(m, conn, participants);
-  } else if (m.messageStubType === 30) { 
-    await handleDemotion(m, conn, participants);
+  const sender = m.key?.participant || m.participant || m.sender;
+
+  if (![29, 30].includes(m.messageStubType)) return;
+
+  const botJid = conn.user.id.split(':')[0] + '@s.whatsapp.net';
+  const BOT_OWNERS = global.owner.map(o => o[0] + '@s.whatsapp.net');
+
+  let founderJid = null;
+  try {
+    const metadata = await conn.groupMetadata(m.chat);
+    founderJid = metadata.owner;
+  } catch {
+    founderJid = null;
   }
+
+  const allowed = [
+    botJid,
+    ...BOT_OWNERS,
+    ...registeredAdmins,
+    founderJid
+  ].filter(Boolean);
+
+  console.log({
+    sender,
+    stub: m.messageStubType,
+    isBotAdmin,
+    participants: participants.map(p => ({ jid: p.jid, admin: p.admin })),
+    allowed
+  });
+
+  if (allowed.includes(sender)) return;
+
+  const usersToDemote = participants
+    .filter(p => p.admin)
+    .map(p => p.jid)
+    .filter(jid => jid && !allowed.includes(jid));
+
+  if (!usersToDemote.length) return;
+
+  await conn.groupParticipantsUpdate(
+    m.chat,
+    usersToDemote,
+    'demote'
+  );
+
+  await conn.groupSettingUpdate(m.chat, 'announcement');
+
+  const action = m.messageStubType === 29 ? 'promozione' : 'retrocessione';
+
+  const text = `🚨 ANTI-NUKE ATTIVO
+
+👤 @${sender.split('@')[0]} ha effettuato una ${action} NON autorizzata.
+
+🔻 Admin rimossi:
+${usersToDemote.map(j => `@${j.split('@')[0]}`).join('\n')}
+
+🔒 Gruppo chiuso per sicurezza.
+
+👑 Owner avvisati:
+${BOT_OWNERS.map(x => `@${x.split('@')[0]}`).join('\n')}
+
+⚠️ Sistema di sicurezza attivo`;
+
+  await conn.sendMessage(m.chat, {
+    text,
+    contextInfo: {
+      mentionedJid: [...usersToDemote, ...BOT_OWNERS].filter(Boolean),
+    },
+  });
 };
 
 export default handler;
