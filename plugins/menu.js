@@ -30,7 +30,8 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 ➤ .owner 👑 *Menu Owner*
 ➤ .giochi 🎮 *Menu Giochi*
 ➤ .mod 🫅🏻 *Menu Moderatori*
-➤ .funzioni *Menu Funzioni*
+➤ .funzioni 🚨 *Menu Funzioni*
+➤ .ludopatici 📱 *Menu Ludopatici*
 ════════════════════
 💀 *BENVENUTO SU NΞXSUS 𝚩𝚯𝐓*
 `.trim();
