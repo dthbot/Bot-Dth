@@ -5,9 +5,8 @@ const handler = async (m, { conn }) => {
   const metadata = await conn.groupMetadata(m.chat);
   const participants = metadata.participants || [];
 
-  // Lista admin
-  const admins = participants.filter(p => p.admin).map(p => `@${p.id.split('@')[0]}`);
-  const totalAdmins = admins.length;
+  // Conteggio admin (senza tag)
+  const totalAdmins = participants.filter(p => p.admin).length;
 
   // Conteggio membri
   const totalMembers = participants.length;
@@ -17,19 +16,18 @@ const handler = async (m, { conn }) => {
   try {
     inviteCode = await conn.groupInviteCode(m.chat);
   } catch {
-    inviteCode = '⚠️ Impossibile recuperare il link.';
+    inviteCode = null;
   }
 
   const caption = `
-🔗 *Link gruppo:* ${inviteCode ? 'https://chat.whatsapp.com/' + inviteCode : 'Non disponibile'}
+🔗 *Link gruppo:* ${inviteCode ? 'https://chat.whatsapp.com/' + inviteCode : '⚠️ Non disponibile'}
 👥 *Membri:* ${totalMembers}
-🛡️ *Admin (${totalAdmins}):* ${admins.join(', ') || 'Nessuno'}
+🛡️ *Admin:* ${totalAdmins}
 🆔 *ID Gruppo:* ${m.chat}
 `.trim();
 
   await conn.sendMessage(m.chat, {
-    text: caption,
-    mentions: admins
+    text: caption
   }, { quoted: m });
 };
 
