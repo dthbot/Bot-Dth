@@ -1,8 +1,12 @@
 const handler = async (m, { conn, text }) => {
+  if (!m.isGroup)
+    return m.reply('⚠️ Questo comando funziona solo nei gruppi.');
+
   const users = global.db.data.users || {};
 
   const mods = Object.entries(users)
-    .filter(([_, user]) =>
+    .filter(([jid, user]) =>
+      user &&
       user.premium === true &&
       user.premiumGroup === m.chat
     )
