@@ -649,7 +649,7 @@ if (m.message?.protocolMessage?.type === 'MESSAGE_EDIT') {
                     }
                 }
 
-                if (chat.modoadmin && !isOwner && !isROwner && m.isGroup && !isAdmin) return
+                if (chat.modoadmin && !isOwner && !isROwner && m.isGroup && !isAdmin && !user.premium) return
                 if (settings.soloCreatore && !isROwner) return
 
                 if (plugin.sam && !isSam) {
