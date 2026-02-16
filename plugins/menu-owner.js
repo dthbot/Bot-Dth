@@ -22,8 +22,7 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 ➤ ${usedPrefix}bigtag 🏹 Tagga tutti spam
 ➤ ${usedPrefix}bonoir 🌙 Segna AFK
 ➤ ${usedPrefix}wakeywakey ✅ Toglie AFK
-➤ ${usedPrefix}pl 🗂️ ti dà il plugin 
-➤ ${usedPrefix}eliminapl 🗑️ elimina il plugin 
+➤ ${usedPrefix}getpl 🗂️ ti dà il plugin 
 
 ════════════════════
 🔖 Versione: *1.0*
