@@ -23,7 +23,8 @@ function getRanking(db) {
     .sort((a, b) => b[1] - a[1])
 }
 
-let handler = async (m, { conn, command }) => {
+let handler = async (m, { conn, command, usedPrefix }) => {
+
   if (!m.isGroup)
     return m.reply('❌ Questo comando funziona solo nei gruppi.')
 
@@ -36,33 +37,53 @@ let handler = async (m, { conn, command }) => {
   let userJid = m.sender
   let userPosition = ranking.findIndex(([jid]) => jid === userJid) + 1
 
-  // 🔹 COMANDO PRINCIPALE (mostra prima messaggi gruppo)
+  // =========================
+  // 📊 STATS (MESSAGGI GRUPPO)
+  // =========================
   if (command === 'stats') {
+
     let totalGroupMessages = ranking.reduce((acc, [, total]) => acc + total, 0)
 
-    let text = `📊 *MESSAGGI TOTALI GRUPPO*\n\n`
-    text += `💬 Totale messaggi: ${totalGroupMessages}\n\n`
-    text += `📍 La tua posizione: ${userPosition || 'Non classificato'}`
+    let text =
+`📊 *MESSAGGI TOTALI GRUPPO*
 
-    let buttons = [
-      { buttonId: '.top', buttonText: { displayText: '🏆 Top 5' }, type: 1 },
-      { buttonId: '.top10', buttonText: { displayText: '🔟 Top 10' }, type: 1 }
+💬 Totale messaggi: ${totalGroupMessages}
+📍 La tua posizione: ${userPosition || 'Non classificato'}`
+
+    const buttons = [
+      {
+        name: "quick_reply",
+        buttonParamsJson: JSON.stringify({
+          display_text: "🏆 Top 5",
+          id: `${usedPrefix}top`
+        })
+      },
+      {
+        name: "quick_reply",
+        buttonParamsJson: JSON.stringify({
+          display_text: "🔟 Top 10",
+          id: `${usedPrefix}top10`
+        })
+      }
     ]
 
-    return conn.sendMessage(m.chat, {
+    return await conn.sendMessage(m.chat, {
       text,
-      footer: 'Statistiche gruppo',
-      buttons,
-      headerType: 1
+      footer: '📊 Statistiche Gruppo',
+      interactiveButtons: buttons
     }, { quoted: m })
   }
 
-  // 🔹 TOP 5
+  // =========================
+  // 🏆 TOP 5
+  // =========================
   if (command === 'top') {
+
     let top5 = ranking.slice(0, 5)
     let medals = ['🥇', '🥈', '🥉', '🏅', '🏅']
-    let text = '🏆 *TOP 5 ATTIVITÀ*\n\n'
     let mentions = []
+
+    let text = '🏆 *TOP 5 ATTIVITÀ*\n\n'
 
     top5.forEach(([jid, total], i) => {
       mentions.push(jid)
@@ -72,17 +93,21 @@ let handler = async (m, { conn, command }) => {
 
     text += `📍 La tua posizione: ${userPosition || 'Non classificato'}`
 
-    return conn.sendMessage(m.chat, {
+    return await conn.sendMessage(m.chat, {
       text,
       mentions
     }, { quoted: m })
   }
 
-  // 🔹 TOP 10
+  // =========================
+  // 🔟 TOP 10
+  // =========================
   if (command === 'top10') {
+
     let top10 = ranking.slice(0, 10)
-    let text = '🏆 *TOP 10 ATTIVITÀ*\n\n'
     let mentions = []
+
+    let text = '🔟 *TOP 10 ATTIVITÀ*\n\n'
 
     top10.forEach(([jid, total], i) => {
       mentions.push(jid)
@@ -92,7 +117,7 @@ let handler = async (m, { conn, command }) => {
 
     text += `📍 La tua posizione: ${userPosition || 'Non classificato'}`
 
-    return conn.sendMessage(m.chat, {
+    return await conn.sendMessage(m.chat, {
       text,
       mentions
     }, { quoted: m })
