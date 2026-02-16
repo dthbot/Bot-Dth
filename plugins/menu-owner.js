@@ -1,7 +1,7 @@
 const handler = async (message, { conn, usedPrefix = '.' }) => {
 
     const menuText = `
-🌩️ 𝐒𝐀𝐂𝐑𝐈𝐅𝐈𝐂𝐄 – 𝐌𝐄𝐍𝐔 𝐎𝐖𝐍𝐄𝐑 ⚡
+🌩️ 𝐍𝚵𝑿𝐒𝐔𝐒 – 𝐌𝐄𝐍𝐔 𝐎𝐖𝐍𝐄𝐑 ⚡
 
 ════════════════════
 🚫 𝐆𝐄𝐒𝐓𝐈𝐎𝐍𝐄 𝐔𝐓𝐄𝐍𝐓𝐈
