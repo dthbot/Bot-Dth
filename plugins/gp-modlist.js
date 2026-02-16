@@ -2,13 +2,15 @@ const handler = async (m, { conn, text }) => {
   const users = global.db.data.users || {};
 
   const mods = Object.entries(users)
-    .filter(([_, user]) => user.premium === true)
+    .filter(([_, user]) =>
+      user.premium === true &&
+      user.premiumGroup === m.chat
+    )
     .map(([jid]) => jid);
 
   if (mods.length === 0)
-    return m.reply('⚠️ 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 ❌ Nessun MOD attivo trovato.');
+    return m.reply('⚠️ 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 ❌ Nessun MOD attivo in questo gruppo.');
 
-  // 📝 Messaggio opzionale
   const customMsg = text
     ? `╔═════[ 𝕄𝔼𝕊𝕊𝔸𝔾𝔾𝕀𝕆 ]══╗
 ${text}
@@ -40,7 +42,7 @@ ${mods.map((jid, i) => `➤ ${i + 1}. @${jid.split('@')[0]}`).join('\n')}
 };
 
 handler.help = ['modlist (messaggio)'];
-handler.tags = ['owner'];
+handler.tags = ['group'];
 handler.command = ['modlist'];
 handler.group = true;
 handler.admin = true;
