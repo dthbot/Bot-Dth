@@ -1,5 +1,4 @@
 import fetch from 'node-fetch'
-import sharp from 'sharp'
 
 const handler = async (m, { conn }) => {
   if (!m.isGroup)
@@ -11,28 +10,18 @@ const handler = async (m, { conn }) => {
 
   let user = global.db.data.users[who] || (global.db.data.users[who] = {});
 
-  // 🔒 Se è già mod in questo gruppo
   if (user.premium && user.premiumGroup === m.chat)
     return m.reply('⚠️ Questo utente è già MOD in questo gruppo.');
 
-  // ✅ Attiva premium
   user.premium = true;
-
-  // ✅ Salva gruppo dove è valido
   user.premiumGroup = m.chat;
 
-  // 📸 Thumbnail profilo ridimensionata
-  let thumb;
+  let thumb = null;
+
   try {
     const ppUrl = await conn.profilePictureUrl(who, 'image');
     const res = await fetch(ppUrl);
-    const buffer = await res.buffer();
-
-    thumb = await sharp(buffer)
-      .resize(200, 200)
-      .jpeg({ quality: 60 })
-      .toBuffer();
-
+    thumb = await res.buffer();
   } catch {
     thumb = null;
   }
@@ -45,10 +34,8 @@ const handler = async (m, { conn }) => {
 ╚═══════════════╝
 
 👤 Utente: ${name}
-⚡ Ruolo attivo SOLO in questo gruppo
-♾️ Durata: Fino a revoca
-
-Benvenuto nello staff di NΞXSUS.
+⚡ Attivo solo in questo gruppo
+♾️ Fino a revoca
 `.trim();
 
   await conn.sendMessage(
@@ -56,10 +43,12 @@ Benvenuto nello staff di NΞXSUS.
     {
       text: caption,
       mentions: [who],
-      contextInfo: {
-        mentionedJid: [who],
-        jpegThumbnail: thumb
-      }
+      contextInfo: thumb
+        ? {
+            mentionedJid: [who],
+            jpegThumbnail: thumb
+          }
+        : { mentionedJid: [who] }
     },
     { quoted: m }
   );
