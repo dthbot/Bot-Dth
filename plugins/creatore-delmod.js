@@ -38,23 +38,13 @@ const handler = async (m, { conn }) => {
   const name = '@' + who.split('@')[0];
 
   const caption = `
-☠──────────────☠
-🛡️ 𝐍ΞXSUS 𝚩𝚯𝐓 • 𝐌𝐎𝐃 𝐑𝐄𝐕𝐎𝐂𝐀𝐓𝐎 🛡️
-☠──────────────☠
+╔═[ 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 ]═╗
+  🛡️ 𝐌𝐎𝐃 𝐑𝐄𝐕𝐎𝐂𝐀𝐓𝐎 🛡️
+╚═══════════════╝
 
-👤 Utente:
-➤ ${name}
-
-💀 Ruolo precedente:
-➤ Guardiano dei rituali di NΞXSUS 𝚩𝚯𝐓
-
-⏳ Stato attuale:
-➤ ✨ POTERI REVOCA 🕳️
-
-🔒 Tutti i privilegi di MOD sono stati rimossi
-⚠️ L’ordine supremo ha deciso: nessun ritorno imminente
-
-🌌 L’energia del rituale si ritira dall’utente...
+👤 Utente: ${name}
+⚡ Revocato solo in questo gruppo
+♾️ Per sempre 
 `.trim();
 
   await conn.sendMessage(
