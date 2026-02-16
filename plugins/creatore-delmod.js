@@ -72,6 +72,6 @@ handler.help = ['delmod @user'];
 handler.tags = ['group'];
 handler.command = ['delmod'];
 handler.group = true;
-handler.admin = true;
+handler.owner = true;
 
 export default handler;
