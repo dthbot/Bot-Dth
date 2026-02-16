@@ -33,6 +33,16 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 ➤ ${usedPrefix}bandiera 🚩
 ➤ ${usedPrefix}classificabandiera 🏆
 ➤ ${usedPrefix}impiccato 🪢
+➤ ${usedPrefix}s / sticker 🏷️
+➤ ${usedPrefix}wm 🔮
+➤ ${usedPrefix}cur 🎶
+➤ ${usedPrefix}sposa 👰🏻
+➤ ${usedPrefix}divorzia 💔
+➤ ${usedPrefix}amante 🫂
+➤ ${usedPrefix}adotta 👶🏻
+➤ ${usedPrefix}famiglia 🧑‍🧑‍🧒‍🧒
+➤ ${usedPrefix}toglifiglio 👣
+➤ ${usedPrefix}togliamante 💔
 
 ════════════════════
 `.trim();
