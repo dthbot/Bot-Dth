@@ -1,4 +1,5 @@
 import fetch from 'node-fetch'
+import sharp from 'sharp'
 
 const handler = async (m, { conn }) => {
   if (!m.isGroup)
@@ -6,37 +7,48 @@ const handler = async (m, { conn }) => {
 
   let who = m.mentionedJid[0] || (m.quoted ? m.quoted.sender : null);
   if (!who)
-    return m.reply('⚠️ Devi taggare l’utente da promuovere a MODERATOR.');
+    return m.reply('⚠️ Devi taggare l’utente da promuovere a MOD.');
 
-  let chat = global.db.data.chats[m.chat] || (global.db.data.chats[m.chat] = {});
-  if (!chat.mods) chat.mods = [];
+  let user = global.db.data.users[who] || (global.db.data.users[who] = {});
 
-  if (chat.mods.includes(who))
-    return m.reply('⚠️ Questo utente è già moderatore in questo gruppo.');
+  // 🔒 Se è già mod in questo gruppo
+  if (user.premium && user.premiumGroup === m.chat)
+    return m.reply('⚠️ Questo utente è già MOD in questo gruppo.');
 
-  chat.mods.push(who);
+  // ✅ Attiva premium
+  user.premium = true;
 
-  // 📸 Prende foto profilo
+  // ✅ Salva gruppo dove è valido
+  user.premiumGroup = m.chat;
+
+  // 📸 Thumbnail profilo ridimensionata
   let thumb;
   try {
     const ppUrl = await conn.profilePictureUrl(who, 'image');
     const res = await fetch(ppUrl);
-    thumb = await res.buffer();
+    const buffer = await res.buffer();
+
+    thumb = await sharp(buffer)
+      .resize(200, 200)
+      .jpeg({ quality: 60 })
+      .toBuffer();
+
   } catch {
-    const res = await fetch('https://i.ibb.co/3Fh9V6p/avatar-contact.png');
-    thumb = await res.buffer();
+    thumb = null;
   }
 
   const name = '@' + who.split('@')[0];
 
   const caption = `
-🛡️ 𝐍ΞXSUS 𝚩𝚯𝐓 • 𝐌𝐎𝐃 𝐃𝐈 𝐆𝐑𝐔𝐏𝐏𝐎 🛡️
+╔═[ 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 ]═╗
+        🛡️ 𝐌𝐎𝐃 𝐀𝐆𝐆𝐈𝐔𝐍𝐓𝐎 🛡️
+╚═══════════════╝
 
 👤 Utente: ${name}
-⚡ Ruolo attivo solo in questo gruppo
+⚡ Ruolo attivo SOLO in questo gruppo
 ♾️ Durata: Fino a revoca
 
-Benvenuto nell’élite del gruppo.
+Benvenuto nello staff di NΞXSUS.
 `.trim();
 
   await conn.sendMessage(
@@ -45,14 +57,8 @@ Benvenuto nell’élite del gruppo.
       text: caption,
       mentions: [who],
       contextInfo: {
-        externalAdReply: {
-          title: '🛡️ Nuovo Moderatore',
-          body: `Promosso: ${name}`,
-          thumbnail: thumb,
-          showAdAttribution: false,
-          renderLargerThumbnail: false,
-          mediaType: 1
-        }
+        mentionedJid: [who],
+        jpegThumbnail: thumb
       }
     },
     { quoted: m }
@@ -63,6 +69,6 @@ handler.help = ['addmod @user'];
 handler.tags = ['group'];
 handler.command = ['addmod'];
 handler.group = true;
-handler.owner = true;
+handler.admin = true;
 
 export default handler;
