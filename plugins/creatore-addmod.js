@@ -1,22 +1,22 @@
 import fetch from 'node-fetch'
 
 const handler = async (m, { conn }) => {
-  let who;
-  if (m.isGroup)
-    who = m.mentionedJid[0] || (m.quoted ? m.quoted.sender : null);
-  else who = m.chat;
+  if (!m.isGroup)
+    return m.reply('⚠️ Questo comando può essere usato solo nei gruppi.');
 
+  let who = m.mentionedJid[0] || (m.quoted ? m.quoted.sender : null);
   if (!who)
     return m.reply('⚠️ Devi taggare l’utente da promuovere a MODERATOR.');
 
-  // ✅ CREA L’UTENTE SE NON ESISTE
-  let user = global.db.data.users[who] || (global.db.data.users[who] = {});
+  let chat = global.db.data.chats[m.chat] || (global.db.data.chats[m.chat] = {});
+  if (!chat.mods) chat.mods = [];
 
-  // 🔒 MOD permanente
-  user.premium = true;
-  user.premiumTime = Infinity;
+  if (chat.mods.includes(who))
+    return m.reply('⚠️ Questo utente è già moderatore in questo gruppo.');
 
-  // 📸 Foto profilo → thumbnail
+  chat.mods.push(who);
+
+  // 📸 Prende foto profilo
   let thumb;
   try {
     const ppUrl = await conn.profilePictureUrl(who, 'image');
@@ -30,28 +30,13 @@ const handler = async (m, { conn }) => {
   const name = '@' + who.split('@')[0];
 
   const caption = `
-☯──────────────☯
-🛡️ 𝐍ΞXSUS 𝚩𝚯𝐓 • 𝐌𝐎𝐃 𝐑𝐈𝐋𝐄𝐕𝐀𝐓𝐎 🛡️
-☯──────────────☯
+🛡️ 𝐍ΞXSUS 𝚩𝚯𝐓 • 𝐌𝐎𝐃 𝐃𝐈 𝐆𝐑𝐔𝐏𝐏𝐎 🛡️
 
-👤 𝐔𝐭𝐞𝐧𝐭𝐞: ${name}
-🌌 𝐋’ESSENZA DEL MOD È STATA INFUSA
+👤 Utente: ${name}
+⚡ Ruolo attivo solo in questo gruppo
+♾️ Durata: Fino a revoca
 
-🗡️ 𝐑𝐮𝐨𝐥𝐨:
-➤ Guardiano dei misteri di NΞXSUS 𝚩𝚯𝐓
-⚡ Controllo totale sui rituali del gruppo
-
-⏳ 𝐃𝐮𝐫𝐚𝐭𝐚:
-➤ ♾️ Eternamente attivo
-
-✨ 𝐀𝐜𝐜𝐞𝐬𝐬𝐨:
-➤ Tutti i poteri moderatore sbloccati
-
-🔥 𝐋𝐨𝐫𝐨 𝐜𝐡𝐞 𝐜𝐨𝐧𝐭𝐫𝐨𝐥𝐥𝐚𝐧𝐨 𝐢 𝐫𝐢𝐭𝐮𝐚𝐥𝐢
-   sono ora al tuo comando, @${who.split('@')[0]}
-
-⚡ Benvenuto nell’ordine supremo di NΞXSUS 𝚩𝚯𝐓 ⚡
-─────────────────────
+Benvenuto nell’élite del gruppo.
 `.trim();
 
   await conn.sendMessage(
@@ -59,14 +44,23 @@ const handler = async (m, { conn }) => {
     {
       text: caption,
       mentions: [who],
-      contextInfo: { jpegThumbnail: thumb }
+      contextInfo: {
+        externalAdReply: {
+          title: '🛡️ Nuovo Moderatore',
+          body: `Promosso: ${name}`,
+          thumbnail: thumb,
+          showAdAttribution: false,
+          renderLargerThumbnail: false,
+          mediaType: 1
+        }
+      }
     },
     { quoted: m }
   );
 };
 
 handler.help = ['addmod @user'];
-handler.tags = ['owner'];
+handler.tags = ['group'];
 handler.command = ['addmod'];
 handler.group = true;
 handler.owner = true;
