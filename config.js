@@ -13,11 +13,11 @@ const moduleCache = new NodeCache({ stdTTL: 300 });
 
 /*⭑⭒━━━✦❘༻☾⋆⁺₊✧ 𝓿𝓪𝓻𝓮𝓫𝓸𝓽 ✧₊⁺⋆☽༺❘✦━━━⭒⭑*/
 
-global.sam = ['212773631903',]
+global.sam = ['573169106889',]
 global.owner = [
-  ['212773631903', '𝕯𝖊ⱥ𝖉𝖑𝐲', true],
+  ['573169106889', '𝕯𝖊ⱥ𝖉𝖑𝐲', true],
   ['212601646793', 'zein', true],
-  ['393801380688', 'vixiie', true],
+  ['393780305934', 'vixiie', true],
   ['xxxxxxxxxx'],
   ['xxxxxxxxxx'],
 ]
@@ -26,9 +26,9 @@ global.prems = ['xxxxxxxxxx', 'xxxxxxxxxx', 'xxxxxxxxxx']
 
 /*⭑⭒━━━✦❘༻🩸 INFO BOT 🕊️༺❘✦━━━⭒⭑*/
 
-global.nomepack = 'ᴅᴛʜ-ʙᴏᴛ'
-global.nomebot = 'ᴅᴛʜ-ʙᴏᴛ'
-global.wm = 'ᴅᴛʜ-ʙᴏᴛ'
+global.nomepack = '𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓'
+global.nomebot = '𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓'
+global.wm = '𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓'
 global.autore = '𝕯𝖊ⱥ𝖉𝖑𝐲'
 global.dev = '𝕯𝖊ⱥ𝖉𝖑𝐲'
 global.testobot = `ᴅᴛʜ-ʙᴏᴛ`
