@@ -20,6 +20,7 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 ➤ ${usedPrefix}muta 🤫 Muta la persona 
 ➤ ${usedPrefix}smuta 🔊 Smuta la persona
 ➤ ${usedPrefix}tag 🏹 Tagga utenti
+➤ ${usedPrefix}setname 🚨 Cambia nome al Gruppo
 
 🔒 𝐈𝐌𝐏𝐎𝐒𝐓𝐀𝐙𝐈𝐎𝐍𝐈 𝐆𝐑𝐔𝐏𝐏𝐎
 ➤ ${usedPrefix}aperto  🌙 Apri gruppo
