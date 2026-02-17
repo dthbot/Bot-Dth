@@ -40,7 +40,7 @@ let handler = async (m, { conn, command, usedPrefix }) => {
   // =========================
   // 📊 STATS (MESSAGGI GRUPPO)
   // =========================
-  if (command === 'stats') {
+  if (command === 'top') {
 
     let totalGroupMessages = ranking.reduce((acc, [, total]) => acc + total, 0)
 
@@ -77,7 +77,7 @@ let handler = async (m, { conn, command, usedPrefix }) => {
   // =========================
   // 🏆 TOP 5
   // =========================
-  if (command === 'top') {
+  if (command === 'top5') {
 
     let top5 = ranking.slice(0, 5)
     let medals = ['🥇', '🥈', '🥉', '🏅', '🏅']
@@ -124,7 +124,7 @@ let handler = async (m, { conn, command, usedPrefix }) => {
   }
 }
 
-handler.command = ['stats', 'top', 'top10']
+handler.command = ['top5', 'top', 'top10']
 handler.tags = ['stats']
 handler.help = ['stats']
 
