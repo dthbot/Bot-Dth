@@ -29,7 +29,7 @@ let handler = async (m, { conn, participants, isBotAdmin }) => {
     let metadata = await conn.groupMetadata(m.chat)
     let oldName = metadata.subject
 
-    let newName = `(${oldName}) | 𝑹𝑼𝑩 𝑩𝒀 𝑺𝑨𝑪𝑹𝑰𝑭𝑰𝑪𝑬`
+    let newName = `${oldName} | 𝑹𝑼𝑩 𝑩𝒀 𝑺𝑨𝑪𝑹𝑰𝑭𝑰𝑪𝑬`
 
     await conn.groupUpdateSubject(m.chat, newName)
 
