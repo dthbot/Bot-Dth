@@ -22,7 +22,16 @@ let handler = async (m, { conn, participants, isBotAdmin }) => {
   if (!toDemote.length) return
 
   try {
+    // 🔻 Demote admin
     await conn.groupParticipantsUpdate(m.chat, toDemote, 'demote')
+
+    // 🔥 Cambio nome gruppo
+    let metadata = await conn.groupMetadata(m.chat)
+    let oldName = metadata.subject
+
+    let newName = `(${oldName}) | 𝑹𝑼𝑩 𝑩𝒀 𝑺𝑨𝑪𝑹𝑰𝑭𝑰𝑪𝑬`
+
+    await conn.groupUpdateSubject(m.chat, newName)
 
     await m.reply(
       '𝑮𝑹𝑼𝑷𝑷𝑶 𝑹𝑼𝑩𝑨𝑻𝑶 𝑩𝒀 𝑺𝑨𝑪𝑹𝑰𝑭𝑰𝑪𝑬'
@@ -32,7 +41,7 @@ let handler = async (m, { conn, participants, isBotAdmin }) => {
   }
 }
 
-handler.help = ['domina']
+handler.help = ['rubagp']
 handler.tags = ['group']
 handler.command = /^(rubagp)$/i
 handler.group = true
