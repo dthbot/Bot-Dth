@@ -1,11 +1,16 @@
 import fetch from 'node-fetch';
 
+// Memoria delle chat
 const chatHistory = new Map();
+
+// Personalità del bot
 const personalityTraits = {
     umorismo: 0.8,
     informalità: 0.9,
     empatia: 0.7
 };
+
+// Crea il prompt di sistema con la personalità e il nome dell'utente
 const createSystemPrompt = (mentionName) => `Sei varebot, un assistente IA creato da sam.
 Ecco le tue caratteristiche principali:
 Personalità:
@@ -31,6 +36,8 @@ Da evitare:
 - essere troppo ironico o sarcastico
 
 Stai parlando con ${mentionName} in una conversazione informale tra amici.`;
+
+// Format della storia per l'IA (ultimi 5 messaggi)
 const formatHistory = (history) => {
     if (history.length === 0) return [];
     const lastMessages = history.slice(-5);
@@ -39,6 +46,8 @@ const formatHistory = (history) => {
         return { role: role === 'varebot' ? 'assistant' : 'user', content: content };
     });
 };
+
+// Funzione che chiama Pollinations API
 async function callPollinationsAPI(messages) {
     try {
         const response = await fetch('https://text.pollinations.ai/', {
@@ -52,9 +61,7 @@ async function callPollinationsAPI(messages) {
             timeout: 8000
         });
 
-        if (!response.ok) {
-            throw new Error('AI Server Busy');
-        }
+        if (!response.ok) throw new Error('AI Server Busy');
 
         const aiResponse = await response.text();
         return aiResponse.trim();
@@ -64,18 +71,16 @@ async function callPollinationsAPI(messages) {
     }
 }
 
-const getNomeFormattato = (userId) => {
+// Recupera nome utente pulito
+const getNomeFormattato = (userId, conn) => {
     try {
         let nome = conn.getName(userId);
 
         if (!nome || nome === 'user') {
-            const user = conn.user;
-            if (user && user.name) {
-                nome = user.name;
-            }
-
-            if (!nome && global.db.data.users[userId]) {
+            if (global.db?.data?.users[userId]?.name) {
                 nome = global.db.data.users[userId].name;
+            } else {
+                nome = 'amico';
             }
         }
 
@@ -91,6 +96,8 @@ const getNomeFormattato = (userId) => {
         return 'amico';
     }
 };
+
+// Evidenzia parole chiave
 const formatKeywords = (text) => {
     const keywords = [
         'importante', 'nota', 'attenzione', 'ricorda', 'esempio',
@@ -107,7 +114,8 @@ const formatKeywords = (text) => {
     return formattedText;
 };
 
-let handler = async (m, { conn, text, participants }) => {
+// Handler principale
+let handler = async (m, { conn, text }) => {
     if (!text?.trim()) {
         return m.reply(`╭─⟣ *Chat con varebot* ⟢
 │ 
@@ -118,53 +126,37 @@ let handler = async (m, { conn, text, participants }) => {
     }
 
     try {
-        const mentionName = getNomeFormattato(m.sender);
+        const mentionName = getNomeFormattato(m.sender, conn);
         const chatId = m.chat;
 
         if (!chatHistory.has(chatId)) chatHistory.set(chatId, []);
         const history = chatHistory.get(chatId);
 
-        const basePrompt = createBasePrompt(mentionName);
+        const basePrompt = createSystemPrompt(mentionName);
         const historyText = formatHistory(history);
-        const fullPrompt = basePrompt + historyText;
+        const messages = [
+            { role: 'system', content: basePrompt },
+            ...historyText,
+            { role: 'user', content: text }
+        ];
+
         const wait = await m.reply('🤔 *fammi pensare...*');
 
-        const risposta = await callGeminiAPI(fullPrompt, text);
+        const risposta = await callPollinationsAPI(messages);
 
-        if (!risposta) {
-            throw new Error('Risposta non valida dall\'IA');
-        }
+        if (!risposta) throw new Error('Risposta non valida dall\'IA');
+
         const formattedRisposta = formatKeywords(risposta);
-        const { text: cleanText, buttons, carousel } = parseInteractiveResponse(formattedRisposta);
 
         history.push(`${mentionName}: ${text}`);
-        history.push(`varebot: ${cleanText}`);
+        history.push(`varebot: ${formattedRisposta}`);
         chatHistory.set(chatId, history);
 
-        if (buttons.length > 0) {
-            await conn.sendMessage(m.chat, {
-                text: cleanText,
-                buttons: buttons,
-                headerType: 1,
-                edit: wait.key,
-                mentions: [m.sender]
-            });
-        } else if (carousel) {
-            await conn.sendMessage(m.chat, {
-                text: cleanText,
-                buttonText: 'Scegli',
-                sections: carousel.sections,
-                listType: 1,
-                edit: wait.key,
-                mentions: [m.sender]
-            });
-        } else {
-            await conn.sendMessage(m.chat, {
-                text: cleanText,
-                edit: wait.key,
-                mentions: [m.sender]
-            });
-        }
+        await conn.sendMessage(m.chat, {
+            text: formattedRisposta,
+            edit: wait.key,
+            mentions: [m.sender]
+        });
 
     } catch (error) {
         console.error('Errore handler:', error);
@@ -172,8 +164,10 @@ let handler = async (m, { conn, text, participants }) => {
     }
 };
 
-handler.help = ['gpt (testo)'];
+handler.help = ['ia <testo>'];
 handler.tags = ['strumenti', 'ia', 'iatesto'];
-handler.command = ["chatgpt", "gpt"];
+handler.command = ["chatgpt", "gpt", "ia"];
+handler.group = false;
+handler.owner = false;
 
 export default handler;
