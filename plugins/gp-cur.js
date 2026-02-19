@@ -176,8 +176,8 @@ const handler = async (m, { conn, usedPrefix, text, command }) => {
     }
 
     return await conn.sendMessage(m.chat, {
-      text: `*_Scegli un opzione da dare a ${username}_*,
-      footer: `Last.fm • ${username} ♪',
+      text: `*_Scegli un opzione da dare a ${username}_*`,
+      footer: `Last.fm • ${username} ♪`,
       interactiveButtons: buttons
     }, { quoted: m })
   }
