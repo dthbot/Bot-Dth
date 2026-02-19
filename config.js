@@ -17,7 +17,7 @@ global.sam = ['573169106889',]
 global.owner = [
   ['573169106889', '𝕯𝖊ⱥ𝖉𝖑𝐲', true],
   ['16018376909', 'vixiie', true],
-  ['xxxxxxxxxx'],
+  ['212601646793', 'zein', true],
   ['xxxxxxxxxx'],
   ['xxxxxxxxxx'],
 ]
