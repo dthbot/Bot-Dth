@@ -55,7 +55,7 @@ let handler = async (m, { conn, command, usedPrefix }) => {
         name: "quick_reply",
         buttonParamsJson: JSON.stringify({
           display_text: "🏆 Top 5",
-          id: `${usedPrefix}top`
+          id: `${usedPrefix}top5`
         })
       },
       {
@@ -77,7 +77,7 @@ let handler = async (m, { conn, command, usedPrefix }) => {
   // =========================
   // 🏆 TOP 5
   // =========================
-  if (command === 'statis5') {
+  if (command === 'top5') {
 
     let top5 = ranking.slice(0, 5)
     let medals = ['🥇', '🥈', '🥉', '🏅', '🏅']
@@ -124,7 +124,7 @@ let handler = async (m, { conn, command, usedPrefix }) => {
   }
 }
 
-handler.command = ['top', 'statis5', 'top10']
+handler.command = ['top', 'top5', 'top10']
 handler.tags = ['stats']
 handler.help = ['stats']
 
