@@ -24,7 +24,8 @@ const handler = async (m, { conn }) => {
 🛡️ *Admin:* ${totalAdmins}
 🆔 *ID Gruppo:* ${m.chat}
 
-🔗 *Link gruppo:* ${inviteCode ? 'https://chat.whatsapp.com/' + inviteCode : '⚠️ Non disponibile'}
+🔗 *Link gruppo:*
+${inviteCode ? 'https://chat.whatsapp.com/' + inviteCode : '⚠️ Non disponibile'}
 `.trim();
 
   await conn.sendMessage(m.chat, {
