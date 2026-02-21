@@ -1,9 +1,9 @@
-const CREATOR = 
-      '212773631903@s.whatsapp.net';
-      '393801380688@s.whatsapp.net';
+const handler = async (m, { conn, command, text, isAdmin }) => {
+  // Ottieni l'elenco degli owner globali del bot
+  const BOT_OWNERS = (global.owner || []).map(o => o[0] + '@s.whatsapp.net');
 
-const handler = async (msg, { conn, command, text, isAdmin }) => {
-  let mentionedJid = msg.mentionedJid?.[0] || msg.quoted?.sender;
+  // Estrai l'utente da tag o numero
+  let mentionedJid = m.mentionedJid?.[0] || m.quoted?.sender;
 
   if (!mentionedJid && text) {
     if (text.endsWith('@s.whatsapp.net') || text.endsWith('@c.us')) {
@@ -16,40 +16,39 @@ const handler = async (msg, { conn, command, text, isAdmin }) => {
     }
   }
 
-  const chatId = msg.chat;
+  const chatId = m.chat;
   const botNumber = conn.user.jid;
-  const groupMetadata = await conn.groupMetadata(chatId);
-  const groupOwner =
-    groupMetadata.owner || chatId.split('-')[0] + '@s.whatsapp.net';
+
+  // Ottieni owner del gruppo
+  let groupOwner = null;
+  try {
+    const metadata = await conn.groupMetadata(chatId);
+    groupOwner = metadata.owner;
+  } catch { groupOwner = null }
 
   if (!isAdmin)
-    throw '╭━━━❌━━━╮\n 𝐀𝐂𝐂𝐄𝐒𝐒𝐎 𝐍𝐄𝐆𝐀𝐓𝐎\n╰━━━❌━━━╯\n\n𝐒𝐨𝐥𝐨 𝐠𝐥𝐢 𝐚𝐝𝐦𝐢𝐧 𝐩𝐨𝐬𝐬𝐨𝐧𝐨 𝐮𝐬𝐚𝐫𝐞 𝐪𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨.';
+    throw '╭━━━❌━━━╮\n 𝐀𝐂𝐂𝐄𝐒𝐒𝐎 𝐍𝐄𝐆𝐀𝐓𝐎\n╰━━━❌━━━╯\n\nSolo gli admin possono usare questo comando.';
 
   if (!mentionedJid)
     return conn.reply(
       chatId,
-      `╭━━━⚠️━━━╮\n 𝐔𝐓𝐄𝐍𝐓𝐄 𝐍𝐎𝐍 𝐓𝐑𝐎𝐕𝐀𝐓𝐎\n╰━━━⚠️━━━╯\n\n𝐓𝐚𝐠𝐠𝐚 𝐥'𝐮𝐭𝐞𝐧𝐭𝐞 𝐝𝐚 ${
-        command === 'muta' ? '𝐦𝐮𝐭𝐚𝐫𝐞 🔇' : '𝐬𝐦𝐮𝐭𝐚𝐫𝐞 🔊'
+      `╭━━━⚠️━━━╮\n 𝐔𝐓𝐄𝐍𝐓𝐄 𝐍𝐎𝐍 𝐓𝐑𝐎𝐕𝐀𝐓𝐎\n╰━━━⚠️━━━╯\nTagga un utente da ${
+        command === 'muta' ? 'mutare 🔇' : 'smutare 🔊'
       }`,
-      msg
+      m
     );
 
-  if (mentionedJid === groupOwner)
-    throw '╭━━━👑━━━╮\n 𝐏𝐑𝐎𝐓𝐄𝐓𝐓𝐎\n╰━━━👑━━━╯\n\n𝐈𝐥 𝐜𝐫𝐞𝐚𝐭𝐨𝐫𝐞 𝐝𝐞𝐥 𝐠𝐫𝐮𝐩𝐩𝐨 𝐧𝐨𝐧 𝐩𝐮𝐨̀ 𝐞𝐬𝐬𝐞𝐫𝐞 𝐦𝐮𝐭𝐚𝐭𝐨.';
+  // Protezioni
+  if ([groupOwner, botNumber, ...BOT_OWNERS].includes(mentionedJid))
+    throw '╭━━━👑━━━╮\n 𝐏𝐑𝐎𝐓𝐄𝐓𝐓𝐎\n╰━━━👑━━━╯\nNon puoi mutare questo utente (owner/creator/bot).';
 
-  if (mentionedJid === CREATOR)
-    throw '╭━━━👑━━━╮\n 𝐂𝐑𝐄𝐀𝐓𝐎𝐑𝐄\n╰━━━👑━━━╯\n\n🚫 𝐈𝐥 𝐜𝐫𝐞𝐚𝐭𝐨𝐫𝐞 𝐝𝐞𝐥 𝐛𝐨𝐭 𝐞̀ 𝐢𝐧𝐭𝐨𝐜𝐜𝐚𝐛𝐢𝐥𝐞.';
-
-  if (mentionedJid === botNumber)
-    throw '𝐍𝐨𝐧 𝐩𝐮𝐨𝐢 𝐦𝐮𝐭𝐚𝐫𝐞 𝐢𝐥 𝐛𝐨𝐭.';
-
+  // Prepara dati utente nel db
   const user = global.db.data.users[mentionedJid];
   const isMute = command === 'muta';
   const tag = '@' + mentionedJid.split('@')[0];
 
-  // 🔇 MUTA
   if (isMute) {
-    if (user.muto) throw '⚠️ 𝐋’𝐮𝐭𝐞𝐧𝐭𝐞 è 𝐠𝐢à 𝐦𝐮𝐭𝐚𝐭𝐨.';
+    if (user.muto) throw '⚠️ L’utente è già mutato.';
     user.muto = true;
 
     return conn.sendMessage(chatId, {
@@ -57,15 +56,15 @@ const handler = async (msg, { conn, command, text, isAdmin }) => {
    ✦ 𝐌𝐔𝐓𝐄 𝐀𝐓𝐓𝐈𝐕𝐀𝐓𝐎 ✦
 ╰━━━━━━━🔇━━━━━━━╯
 
-👤 𝐔𝐭𝐞𝐧𝐭𝐞: ${tag}
-🔒 𝐒𝐭𝐚𝐭𝐨: 𝐌𝐮𝐭𝐚𝐭𝐨
-⏳ 𝐃𝐮𝐫𝐚𝐭𝐚: 𝐅𝐢𝐧𝐨 𝐚 .𝐬𝐦𝐮𝐭𝐚`,
+👤 Utente: ${tag}
+🔒 Stato: Mutato
+⏳ Durata: Fino a .smuta`,
       mentions: [mentionedJid],
     });
   }
 
-  // 🔊 SMUTA
-  if (!user.muto) throw '⚠️ 𝐋’𝐮𝐭𝐞𝐧𝐭𝐞 𝐧𝐨𝐧 è 𝐦𝐮𝐭𝐚𝐭𝐨.';
+  // SMUTA
+  if (!user.muto) throw '⚠️ L’utente non è mutato.';
   user.muto = false;
 
   return conn.sendMessage(chatId, {
@@ -73,8 +72,8 @@ const handler = async (msg, { conn, command, text, isAdmin }) => {
    ✦ 𝐌𝐔𝐓𝐄 𝐑𝐈𝐌𝐎𝐒𝐒𝐎 ✦
 ╰━━━━━━━🔊━━━━━━━╯
 
-👤 𝐔𝐭𝐞𝐧𝐭𝐞: ${tag}
-🔓 𝐒𝐭𝐚𝐭𝐨: 𝐒𝐦𝐮𝐭𝐚𝐭𝐨`,
+👤 Utente: ${tag}
+🔓 Stato: Smutato`,
     mentions: [mentionedJid],
   });
 };
