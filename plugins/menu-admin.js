@@ -5,8 +5,6 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 
 ════════════════════
 👑 𝐆𝐄𝐒𝐓𝐈𝐎𝐍𝐄 𝐑𝐔𝐎𝐋𝐈
-➤ ${usedPrefix}p ✨ Promuovi utente
-➤ ${usedPrefix}r 🔥 Retrocedi utente
 ➤ ${usedPrefix}admins  🛡️ Lista admin
 
 ⚠️ 𝐖𝐀𝐑𝐍 & 𝐃𝐈𝐒𝐂𝐈𝐏𝐋𝐈𝐍𝐀
@@ -32,6 +30,7 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 
 🔗 𝐋𝐈𝐍𝐊
 ➤ ${usedPrefix}link   🔗 Link gruppo
+➤ ${usedPrefix}prendilink 🚨 Prende link dal qr
 
 ════════════════════
 🔖 Versione: *1.0*
