@@ -315,26 +315,30 @@ async function connectionUpdate(update) {
         global.connectionMessagesPrinted = {};
         if (!global.isLogoPrinted) {
             const finchevedotuttoviolaviola = [
-                '#3b0d95', '#3b0d90', '#3b0d85', '#3b0d80', '#3b0d75',
-                '#3b0d70', '#3b0d65', '#3b0d60', '#3b0d55', '#3b0d50', '#3b0d45'
-            ];
-            const varebot = [
-                ` ██▒   █▓ ▄▄▄       ██▀███  ▓█████  ▄▄▄▄    ▒█████  ▄▄▄█████▓   `,
-                `▓██░   █▒▒████▄    ▓██ ▒ ██▒▓█   ▀ ▓█████▄ ▒██▒  ██▒▓  ██▒ ▓▒   `,
-                ` ▓██  █▒░▒██  ▀█▄  ▓██ ░▄█ ▒▒███   ▒██▒ ▄██▒██░  ██▒▒ ▓██░ ▒░   `,
-                `  ▒██ █░░░██▄▄▄▄██ ▒██▀▀█▄  ▒▓█  ▄ ▒██░█▀  ▒██   ██░░ ▓██▓ ░    `,
-                `   ▒▀█░   ▓█   ▓██▒░██▓ ▒██▒░▒████▒░▓█  ▀█▓░ ████▓▒░  ▒██▒ ░    `,
-                `   ░ ▐░   ▒▒   ▓▒█░░ ▒▓ ░▒▓░░░ ▒░ ░░▒▓███▀▒░ ▒░▒░▒░   ▒ ░░      `,
-                `   ░ ░░    ▒   ▒▒ ░  ░▒ ░ ▒░ ░ ░  ░▒░▒   ░   ░ ▒ ▒░     ░       `,
-                `     ░░    ░   ▒     ░░   ░    ░    ░    ░ ░ ░ ▒░    ░         `,
-                `      ░        ░  ░   ░        ░  ░ ░          ░ ░              `,
-                `     ░                                   ░                      `
-            ];
-            varebot.forEach((line, i) => {
-                const color = finchevedotuttoviolaviola[i] || finchevedotuttoviolaviola[finchevedotuttoviolaviola.length - 1];
-                console.log(chalk.hex(color)(line));
-            });
-            global.isLogoPrinted = true;
+    '#00BFFF', '#00C9C9', '#00D4D4', '#00DE9E', '#00E868',
+    '#2ECC71', '#2ECC71', '#00E868', '#00DE9E', '#00D4D4'
+];
+
+const nexsusbot = [
+    ` ███▄    █ ▓█████ ▒██   ██▒  ██████  █    ██   ██████     ▄▄▄▄    ▒█████  ▄▄▄█████▓ `,
+    ` ██ ▀█   █ ▓█   ▀ ▒▒ █ █ ▒░▒██    ▒  ██  ▓██▒▒██    ▒    ▓█████▄ ▒██▒  ██▒▓  ██▒ ▓▒ `,
+    `▓██  ▀█ ██▒▒███    ░  █   ░░ ▓██▄   ▓██  ▒██░░ ▓██▄      ▒██▒ ▄██▒██░  ██▒▒ ▓██░ ▒░ `,
+    `▓██▒  ▐▌██▒▒▓█  ▄   ░ █ █ ▒  ▒   ██▒▓▓█  ░██░  ▒   ██▒   ▒██░█▀  ▒██   ██░░ ▓██▓ ░  `,
+    `▒██░   ▓██░░▒████▒▒██▒ ▒██▒▒██████▒▒▒▒█████▓ ▒██████▒▒   ░▓█  ▀█▓░ ████▓▒░  ▒██▒ ░  `,
+    `░ ▒░   ▒ ▒ ░░ ▒░ ░▒▒ ░ ░▓ ░▒ ▒▓▒ ▒ ░░▒▓▒ ▒ ▒ ▒ ▒▓▒ ▒ ░   ░▒▓███▀▒░ ▒░▒░▒░   ▒ ░░    `,
+    `░ ░░   ░ ▒░ ░ ░  ░░ ░   ░ ▒░ ░▒  ░ ░░░▒░ ░ ░ ░ ░▒  ░ ░   ▒░▒   ░   ░ ▒ ▒░     ░     `,
+    `   ░   ░ ░    ░   ░ ░   ░  ░  ░  ░   ░░░ ░ ░ ░  ░  ░      ░    ░ ░ ░ ▒░    ░       `,
+    `         ░    ░  ░      ░           ░        ░          ░ ░          ░ ░            `,
+    `                                                              ░                     `
+];
+
+nexsusbot.forEach((line, i) => {
+    const color = finchevedotuttoviolaviola[i] || finchevedotuttoviolaviola[finchevedotuttoviolaviola.length - 1];
+    console.log(chalk.hex(color)(line));
+});
+
+global.isLogoPrinted = true;
+
         }
     }
     if (connection === 'close') {
