@@ -311,35 +311,52 @@ async function connectionUpdate(update) {
         global.qrGenerated = true;
     }
     if (connection === 'open') {
-        global.qrGenerated = false;
-        global.connectionMessagesPrinted = {};
-        if (!global.isLogoPrinted) {
-            const finchevedotuttoviolaviola = [
-                '#3b0d95', '#3b0d90', '#3b0d85', '#3b0d80', '#3b0d75',
-                '#3b0d70', '#3b0d65', '#3b0d60', '#3b0d55', '#3b0d50', '#3b0d45'
-            ];
-            const varebot = [
-                ` ██▒   █▓ ▄▄▄       ██▀███  ▓█████  ▄▄▄▄    ▒█████  ▄▄▄█████▓   `,
-                `▓██░   █▒▒████▄    ▓██ ▒ ██▒▓█   ▀ ▓█████▄ ▒██▒  ██▒▓  ██▒ ▓▒   `,
-                ` ▓██  █▒░▒██  ▀█▄  ▓██ ░▄█ ▒▒███   ▒██▒ ▄██▒██░  ██▒▒ ▓██░ ▒░   `,
-                `  ▒██ █░░░██▄▄▄▄██ ▒██▀▀█▄  ▒▓█  ▄ ▒██░█▀  ▒██   ██░░ ▓██▓ ░    `,
-                `   ▒▀█░   ▓█   ▓██▒░██▓ ▒██▒░▒████▒░▓█  ▀█▓░ ████▓▒░  ▒██▒ ░    `,
-                `   ░ ▐░   ▒▒   ▓▒█░░ ▒▓ ░▒▓░░░ ▒░ ░░▒▓███▀▒░ ▒░▒░▒░   ▒ ░░      `,
-                `   ░ ░░    ▒   ▒▒ ░  ░▒ ░ ▒░ ░ ░  ░▒░▒   ░   ░ ▒ ▒░     ░       `,
-                `     ░░    ░   ▒     ░░   ░    ░    ░    ░ ░ ░ ▒░    ░         `,
-                `      ░        ░  ░   ░        ░  ░ ░          ░ ░              `,
-                `     ░                                   ░                      `
-            ];
-            varebot.forEach((line, i) => {
-                const color = finchevedotuttoviolaviola[i] || finchevedotuttoviolaviola[finchevedotuttoviolaviola.length - 1];
-                console.log(chalk.hex(color)(line));
-            });
-            global.isLogoPrinted = true;
-            await bysamakavare();
-        }
-        const perfConfig = getPerformanceConfig();
-        Logger.info('Performance Config:', perfConfig);
+    global.qrGenerated = false;
+    global.connectionMessagesPrinted = {};
+
+    if (!global.isLogoPrinted) {
+
+        const gradientColors = [
+            '#00BFFF',
+            '#00CED1',
+            '#20B2AA',
+            '#2ECC71',
+            '#00BFFF',
+            '#00CED1',
+            '#20B2AA',
+            '#2ECC71'
+        ];
+
+        const nexusbot = [
+`███╗   ██╗███████╗██╗  ██╗███████╗██╗   ██╗███████╗`,
+`████╗  ██║██╔════╝╚██╗██╔╝██╔════╝██║   ██║██╔════╝`,
+`██╔██╗ ██║█████╗   ╚███╔╝ █████╗  ██║   ██║███████╗`,
+`██║╚██╗██║██╔══╝   ██╔██╗ ██╔══╝  ██║   ██║╚════██║`,
+`██║ ╚████║███████╗██╔╝ ██╗███████╗╚██████╔╝███████║`,
+`╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚══════╝`,
+``,
+`        ██████╗  ██████╗ ████████╗`,
+`        ██╔══██╗██╔═══██╗╚══██╔══╝`,
+`        ██████╔╝██║   ██║   ██║   `,
+`        ██╔══██╗██║   ██║   ██║   `,
+`        ██████╔╝╚██████╔╝   ██║   `,
+`        ╚═════╝  ╚═════╝    ╚═╝   `,
+        ];
+
+        nexusbot.forEach((line, i) => {
+            const color = gradientColors[i % gradientColors.length];
+            console.log(chalk.hex(color)(line));
+        });
+
+        console.log(chalk.hex('#2ECC71').bold('\n✨ 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 ONLINE ✨\n'));
+
+        global.isLogoPrinted = true;
+        await bysamakavare();
     }
+
+    const perfConfig = getPerformanceConfig();
+    Logger.info('Performance Config:', perfConfig);
+}
     if (connection === 'close') {
         const reason = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
         if (reason === DisconnectReason.badSession && !global.connectionMessagesPrinted.badSession) {
@@ -347,11 +364,11 @@ async function connectionUpdate(update) {
             global.connectionMessagesPrinted.badSession = true;
             await global.reloadHandler(true).catch(console.error);
         } else if (reason === DisconnectReason.connectionLost && !global.connectionMessagesPrinted.connectionLost) {
-            console.log(chalk.bold.blueBright(`\n╭⭑⭒━━━✦❘༻ ⚠️ CONNESSIONE PERSA COL SERVER ༺❘✦━━━⭒⭑\n┃ 🔄 RICONNESSIONE IN CORSO... \n╰⭑⭒━━━✦❘༻☾⋆₊✧ 𝓿𝓪𝓻𝓮𝓫𝓸𝓽 ✧₊⁺⋆☽༺❘✦━━━⭒⭑`));
+            console.log(chalk.bold.blueBright(`\n╭⭑⭒━━━✦❘༻ ⚠️ CONNESSIONE PERSA COL SERVER ༺❘✦━━━⭒⭑\n┃ 🔄 RICONNESSIONE IN CORSO... \n╰⭑⭒━━━✦❘༻ 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 ༺❘✦━━━⭒⭑`));
             global.connectionMessagesPrinted.connectionLost = true;
             await global.reloadHandler(true).catch(console.error);
         } else if (reason === DisconnectReason.connectionReplaced && !global.connectionMessagesPrinted.connectionReplaced) {
-            console.log(chalk.bold.yellowBright(`╭⭑⭒━━━✦❘༻ ⚠️ CONNESSIONE SOSTITUITA ༺❘✦━━━⭒⭑\n┃ È stata aperta un'altra sessione, \n┃ chiudi prima quella attuale.\n╰⭑⭒━━━✦❘༻☾⋆⁺₊✧ 𝓿𝓪𝓻𝓮𝓫𝓸𝓽 ✧₊⁺⋆☽༺❘✦━━━⭒⭑`));
+            console.log(chalk.bold.yellowBright(`╭⭑⭒━━━✦❘༻ ⚠️ CONNESSIONE SOSTITUITA ༺❘✦━━━⭒⭑\n┃ È stata aperta un'altra sessione, \n┃ chiudi prima quella attuale.\n╰⭑⭒━━━✦❘༻𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓༺❘✦━━━⭒⭑`));
             global.connectionMessagesPrinted.connectionReplaced = true;
         } else if (reason === DisconnectReason.loggedOut && !global.connectionMessagesPrinted.loggedOut) {
             console.log(chalk.bold.redBright(`\n⚠️ DISCONNESSO, CARTELLA ${global.authFile} ELIMINATA. RIAVVIA IL BOT E SCANSIONA IL CODICE QR ⚠️`));
@@ -392,10 +409,10 @@ process.on('uncaughtException', console.error);
 async function connectSubBots() {
     const subBotDirectory = './varebot-sub';
     if (!existsSync(subBotDirectory)) {
-        console.log(chalk.bold.magentaBright('🌙 vare ✧ bot non ha Sub-Bot collegati. Creazione directory...'));
+        console.log(chalk.hex('#00CED1').bold('🌐 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 non ha Sub-Bot collegati. Creazione directory...'));
         try {
             mkdirSync(subBotDirectory, { recursive: true });
-            console.log(chalk.bold.green('✅ Directory varebot-sub creata con successo.'));
+            console.log(chalk.hex('#2ECC71').bold('✅ Directory nexusbot-sub creata con successo.'));
         } catch (err) {
             console.log(chalk.bold.red('❌ Errore nella creazione della directory varebot-sub:', err.message));
             return;
