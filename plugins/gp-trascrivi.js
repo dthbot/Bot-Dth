@@ -1,37 +1,48 @@
 // pip install openai-whisper && npm install fluent-ffmpeg && pip install faster-whisper
 
 import fs from 'fs'
-import { exec } from 'child_process'
 import path from 'path'
+import { exec } from 'child_process'
+import ffmpeg from 'fluent-ffmpeg'
 
 const handler = async (m, { conn }) => {
-  if (!m.isGroup)
-    return m.reply('⚠️ Solo nei gruppi.');
-
+  if (!m.isGroup) return m.reply('⚠️ Solo nei gruppi.')
   if (!m.quoted || !/audio/.test(m.quoted.mimetype))
-    return m.reply('⚠️ Rispondi a un audio.');
+    return m.reply('⚠️ Rispondi a un messaggio audio.')
 
-  await m.reply('🎙️ Trascrizione in corso...');
+  await m.reply('🎙️ Trascrizione in corso...')
 
   try {
-    const audioBuffer = await m.quoted.download();
-    const filePath = path.join('./tmp', `${Date.now()}.ogg`);
-    const outputPath = filePath.replace('.ogg', '.txt');
+    // scarica l'audio
+    const audioBuffer = await m.quoted.download()
+    const fileBase = `${Date.now()}`
+    const oggPath = path.join('.', `${fileBase}.ogg`)
+    const wavPath = path.join('.', `${fileBase}.wav`)
+    const txtPath = path.join('.', `${fileBase}.txt`)
 
-    fs.writeFileSync(filePath, audioBuffer);
+    // salva l'audio scaricato
+    fs.writeFileSync(oggPath, audioBuffer)
 
-    exec(`whisper ${filePath} --language Italian --model small --output_format txt --output_dir ./tmp`, async (err) => {
+    // converte in WAV con ffmpeg
+    await new Promise((resolve, reject) => {
+      ffmpeg(oggPath)
+        .toFormat('wav')
+        .save(wavPath)
+        .on('end', resolve)
+        .on('error', reject)
+    })
+
+    // esegue whisper locale
+    exec(`whisper "${wavPath}" --model small --output_format txt --output_dir . --language Italian`, async (err) => {
       if (err) {
-        console.error(err);
-        return m.reply('❌ Errore nella trascrizione.');
+        console.error(err)
+        return m.reply('❌ Errore nella trascrizione.')
       }
 
-      const resultFile = filePath.replace('.ogg', '.txt');
+      if (!fs.existsSync(txtPath))
+        return m.reply('❌ File di trascrizione non trovato.')
 
-      if (!fs.existsSync(resultFile))
-        return m.reply('❌ File trascrizione non trovato.');
-
-      const text = fs.readFileSync(resultFile, 'utf-8');
+      const text = fs.readFileSync(txtPath, 'utf-8')
 
       await conn.sendMessage(
         m.chat,
@@ -45,22 +56,22 @@ ${text}
 `.trim()
         },
         { quoted: m }
-      );
+      )
 
-      // pulizia file
-      fs.unlinkSync(filePath);
-      fs.unlinkSync(resultFile);
-    });
-
+      // pulizia dei file
+      fs.unlinkSync(oggPath)
+      fs.unlinkSync(wavPath)
+      fs.unlinkSync(txtPath)
+    })
   } catch (e) {
-    console.error(e);
-    m.reply('❌ Errore.');
+    console.error(e)
+    m.reply('❌ Errore durante la trascrizione.')
   }
-};
+}
 
-handler.help = ['trascrivi'];
-handler.tags = ['group'];
-handler.command = ['trascrivi'];
-handler.group = true;
+handler.help = ['trascrivi']
+handler.tags = ['group']
+handler.command = ['trascrivi']
+handler.group = true
 
-export default handler;
+export default handler
