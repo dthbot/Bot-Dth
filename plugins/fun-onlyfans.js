@@ -37,9 +37,6 @@ const handler = async (m, { conn, args }) => {
 
 📝 Bio:
 "${bio}"
-
-════════════════════
-⚠️ Profilo simulato a scopo di intrattenimento
 `.trim()
 
   await conn.sendMessage(m.chat, { text: profilo })
