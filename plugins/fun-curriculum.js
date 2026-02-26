@@ -1,4 +1,5 @@
-// Plugin by deadly
+// Plugin fatto da deadly
+
 global.curriculumGame = global.curriculumGame || {}
 
 const random = (arr) => arr[Math.floor(Math.random() * arr.length)]
@@ -6,104 +7,116 @@ const randomNum = (min, max) => Math.floor(Math.random() * (max - min + 1)) + mi
 
 // 📝 LISTE
 const lavori = [
-    { nome: "Web Developer", desc: "💻 Crea siti e applicazioni web" },
-    { nome: "Data Scientist", desc: "📊 Analizza dati e crea insight" },
-    { nome: "Graphic Designer", desc: "🎨 Disegna loghi e grafiche" },
-    { nome: "Marketing Specialist", desc: "📈 Promuove brand e prodotti" },
-    { nome: "Social Media Manager", desc: "📱 Gestisce profili e community" },
-    { nome: "AI Engineer", desc: "🤖 Sviluppa algoritmi e AI" },
-    { nome: "Game Designer", desc: "🎮 Crea giochi e mondi virtuali" }
+    { nome: "Web Developer", desc: "💻 Crea siti e applicazioni web", paga: 2500 },
+    { nome: "Data Scientist", desc: "📊 Analizza dati e crea insight", paga: 3000 },
+    { nome: "Graphic Designer", desc: "🎨 Disegna loghi e grafiche", paga: 1800 },
+    { nome: "Marketing Specialist", desc: "📈 Promuove brand e prodotti", paga: 2100 },
+    { nome: "Social Media Manager", desc: "📱 Gestisce profili e community", paga: 1600 },
+    { nome: "AI Engineer", desc: "🤖 Sviluppa algoritmi e AI", paga: 3500 },
+    { nome: "Game Designer", desc: "🎮 Crea giochi e mondi virtuali", paga: 2200 }
 ]
 
 const aziende = ["Google", "Meta", "Amazon", "Tesla", "OpenAI", "Microsoft", "Netflix", "Startup Innovativa SRL"]
 const studi = ["Laurea in Informatica", "Laurea in Economia", "Diploma Tecnico Informatico", "Master in Marketing Digitale", "Laurea in Ingegneria"]
-const skillsList = ["Problem Solving", "Team Leadership", "JavaScript", "Cybersecurity", "UI/UX Design", "AI & Automation", "Data Analysis"]
 
-// Bottoni riutilizzabili
 const jobButtons = (prefix) => [
-    {
-        buttonId: `${prefix}curriculum`,
-        buttonText: { displayText: '🔄 Rigenera' },
-        type: 1
-    },
-    {
-        buttonId: `${prefix}cercalavoro`,
-        buttonText: { displayText: '💼 Cerca Lavoro' },
-        type: 1
-    }
+    { buttonId: `${prefix}curriculum`, buttonText: { displayText: '📄 Rigenera CV' }, type: 1 },
+    { buttonId: `${prefix}cercalavoro`, buttonText: { displayText: '💼 Nuova Ricerca' }, type: 1 }
 ];
 
-let handler = async (m, { conn, usedPrefix, command }) => {
+let handler = async (m, { conn, usedPrefix, command, text }) => {
     const chat = m.chat
+    const user = m.sender
 
-    // Gestione comando CERCA LAVORO
+    // Inizializza sessione se non esiste
+    global.curriculumGame[chat] = global.curriculumGame[chat] || {}
+
+    // --- COMANDO CERCA LAVORO ---
     if (command === 'cercalavoro') {
-        let reply = '💼 *OPPORTUNITÀ DISPONIBILI:*\n\n'
+        let listaProposte = []
+        let reply = '💼 *OFFERTE DI LAVORO DISPONIBILI*\n\n'
+        reply += '_Rispondi con il numero (es. 1) per accettare!_\n\n'
+        
         let used = new Set()
         while (used.size < 5) {
-            const job = random(lavori)
+            let job = random(lavori)
             if (!used.has(job.nome)) {
                 used.add(job.nome)
-                reply += `• *${job.nome}*\n_${job.desc}_\n\n`
+                listaProposte.push(job)
+                reply += `*${used.size}.* ${job.nome}\n`
+                reply += `   └ ${job.desc}\n`
+                reply += `   💰 Stipendio: *${job.paga}€*\n\n`
             }
         }
         
+        // Salviamo le proposte correnti per questa chat/utente
+        global.curriculumGame[chat][user] = { proposte: listaProposte, timestamp: Date.now() }
+
         return await conn.sendMessage(chat, {
             text: reply,
-            footer: 'Seleziona un\'opzione qui sotto',
+            footer: 'Scrivi un numero o usa i bottoni',
             buttons: jobButtons(usedPrefix),
             headerType: 1
         }, { quoted: m })
     }
 
-    // Gestione comando CURRICULUM (Generazione)
-    const nome = await conn.getName(m.sender)
+    // --- COMANDO CURRICULUM (Generico) ---
+    const nome = await conn.getName(user)
     const lavoro = random(lavori).nome
     const azienda = random(aziende)
     const studio = random(studi)
     const esperienza = randomNum(1, 15)
-    const skills = Array.from({ length: 4 }, () => random(skillsList)).join(" • ")
-    const email = nome.toLowerCase().replace(/[^a-z0-9]/g, '') + randomNum(10, 99) + "@gmail.com"
-    const telefono = "+39 3" + randomNum(10000000, 99999999)
 
     const cvText = `📄 *CURRICULUM VITAE*
-
 👤 *Candidato*: ${nome}
-💼 *Ruolo*: ${lavoro}
-🏢 *Ultima Azienda*: ${azienda}
+💼 *Ruolo attuale*: ${lavoro}
+🏢 *Azienda*: ${azienda}
 📅 *Esperienza*: ${esperienza} anni
-
 🎓 *Formazione*: ${studio}
-🛠️ *Competenze*: ${skills}
-
-📧 *Contatti*: ${email}
-📱 *Telefono*: ${telefono}
 
 > 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓`
 
     await conn.sendMessage(chat, {
         text: cvText,
-        footer: 'Cosa vuoi fare ora?',
         buttons: jobButtons(usedPrefix),
         headerType: 1
     }, { quoted: m })
 }
 
-// Handler per i bottoni (se cliccati)
+// --- LOGICA DI RISPOSTA AL NUMERO (BEFORE) ---
 handler.before = async (m, { conn, usedPrefix }) => {
-    // Se il messaggio è un click di un bottone che contiene i nostri ID
-    if (m.type === 'buttons_response_message' || m.type === 'template_button_reply_message') {
-        const id = m.buttonId || m.selectedButtonId
-        if (id === `${usedPrefix}curriculum` || id === `${usedPrefix}cercalavoro`) {
-            // Non serve fare nulla qui perché il comando verrà triggerato 
-            // nuovamente dal sistema principale del bot ricononscendo l'ID
-        }
+    const chat = m.chat
+    const user = m.sender
+    
+    // Controlliamo se l'utente ha una ricerca attiva
+    if (!global.curriculumGame?.[chat]?.[user]) return
+    
+    const session = global.curriculumGame[chat][user]
+    const input = m.text?.trim()
+    
+    // Se l'input è un numero tra 1 e la lunghezza delle proposte
+    if (/^[1-5]$/.test(input)) {
+        const scelta = session.proposte[parseInt(input) - 1]
+        const nomeUser = await conn.getName(user)
+
+        // Ricordiamo il fatto dei passi richiesto nelle istruzioni!
+        const kmMessaggio = `\n\n🚶 *Nota per il tragitto:* Ricorda che per raggiungere l'ufficio dovrai fare circa 2,5 chilometri, ovvero **3.750 passi**!`
+
+        const conferma = `🥳 *CONGRATULAZIONI ${nomeUser.toUpperCase()}!*\n\n` +
+            `Hai accettato il lavoro come *${scelta.nome}*.\n` +
+            `Preparati, inizierai domani mattina presso la tua nuova sede!\n\n` +
+            `💶 Stipendio pattuito: *${scelta.paga}€/mese*` + 
+            kmMessaggio
+
+        await conn.reply(chat, conferma, m)
+        
+        // Puliamo la sessione dopo l'assunzione
+        delete global.curriculumGame[chat][user]
     }
 }
 
 handler.help = ['curriculum', 'cercalavoro']
 handler.tags = ['fun']
 handler.command = /^(curriculum|cercalavoro)$/i
-handler.group = false
 
 export default handler
