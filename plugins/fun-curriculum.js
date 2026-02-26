@@ -20,8 +20,8 @@ const aziende = ["Google", "Meta", "Amazon", "Tesla", "OpenAI", "Microsoft", "Ne
 const studi = ["Laurea in Informatica", "Laurea in Economia", "Diploma Tecnico Informatico", "Master in Marketing Digitale", "Laurea in Ingegneria"]
 
 const jobButtons = (prefix) => [
-    { buttonId: `${prefix}curriculum`, buttonText: { displayText: '📄 Rigenera CV' }, type: 1 },
-    { buttonId: `${prefix}cercalavoro`, buttonText: { displayText: '💼 Nuova Ricerca' }, type: 1 }
+    { buttonId: `${prefix}curriculum`, buttonText: { displayText: '📄 Rigenera Curriculum' }, type: 1 },
+    { buttonId: `${prefix}cercalavoro`, buttonText: { displayText: '💼 Cerca Lavoro' }, type: 1 }
 ];
 
 let handler = async (m, { conn, usedPrefix, command, text }) => {
@@ -100,7 +100,7 @@ handler.before = async (m, { conn, usedPrefix }) => {
         const nomeUser = await conn.getName(user)
 
         // Ricordiamo il fatto dei passi richiesto nelle istruzioni!
-        const kmMessaggio = `\n\n🚶 *Nota per il tragitto:* Ricorda che per raggiungere l'ufficio dovrai fare circa 2,5 chilometri, ovvero **3.750 passi**!`
+        const kmMessaggio = `\n\n🚶 *Speriamo che non vieni licenziato 😅`
 
         const conferma = `🥳 *CONGRATULAZIONI ${nomeUser.toUpperCase()}!*\n\n` +
             `Hai accettato il lavoro come *${scelta.nome}*.\n` +
