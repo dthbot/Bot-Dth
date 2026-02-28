@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 import { createCanvas, loadImage } from 'canvas'
 
-// 🧠 Brainrot immagini e coordinate faccia
+// 🧠 Immagini brainrot dirette (solo .jpg o .png pubbliche)
 const brainrotImages = [
   "https://i.imgur.com/v6kz7mb.jpg",
   "https://i.imgur.com/3693Qnq.jpg",
@@ -9,7 +9,7 @@ const brainrotImages = [
   "https://i.imgur.com/6vmd1jh.jpg"
 ]
 
-// [x, y, width, height] della faccia per ciascuna immagine
+// [x, y, width, height] della faccia in ciascuna immagine
 const faceCoords = [
   [150, 120, 180, 180],
   [120, 100, 200, 200],
@@ -31,14 +31,15 @@ const brainrotFrasi = [
   "MODALITÀ CRINGE ATTIVA"
 ]
 
-// Funzione principale per generare brainrot
+// Funzione principale: combina foto utente + brainrot
 async function brainrotFace(userBuffer) {
   const index = Math.floor(Math.random() * brainrotImages.length)
   const brainrotUrl = brainrotImages[index]
   const coords = faceCoords[index]
 
-  // Carica immagine base
+  // Carica immagine brainrot
   const res = await fetch(brainrotUrl)
+  if (!res.ok) throw new Error("Immagine brainrot non trovata")
   const brainrotBuffer = Buffer.from(await res.arrayBuffer())
   const brainrotImg = await loadImage(brainrotBuffer)
   const userImg = await loadImage(userBuffer)
@@ -46,7 +47,7 @@ async function brainrotFace(userBuffer) {
   const canvas = createCanvas(brainrotImg.width, brainrotImg.height)
   const ctx = canvas.getContext('2d')
 
-  // Disegna immagine base
+  // Disegna immagine brainrot base
   ctx.drawImage(brainrotImg, 0, 0)
 
   // Sovrapponi faccia dell'utente
@@ -67,13 +68,12 @@ async function brainrotFace(userBuffer) {
   ctx.strokeStyle = "black"
   ctx.lineWidth = 6
   ctx.textAlign = "center"
-
   wrapText(ctx, frase, canvas.width / 2, canvas.height - 120, canvas.width - 100, 70)
 
   return canvas.toBuffer("image/jpeg")
 }
 
-// Funzione per testo a più righe
+// Funzione per testo multi-riga
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   const words = text.split(' ')
   let line = ''
@@ -96,7 +96,7 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   })
 }
 
-// Handler del comando
+// Handler comando brainrot
 let handler = async (m, { conn }) => {
   let who = m.sender
   if (m.quoted) who = m.quoted.sender
@@ -106,10 +106,13 @@ let handler = async (m, { conn }) => {
   try {
     const ppUrl = await conn.profilePictureUrl(who, 'image')
     const res = await fetch(ppUrl)
+    if (!res.ok) throw new Error("DP non trovata")
+    const contentType = res.headers.get('content-type')
+    if (!contentType.startsWith('image/')) throw new Error("Non è un'immagine valida")
     userBuffer = Buffer.from(await res.arrayBuffer())
   } catch {
-    // Fallback se non ha foto profilo
-    const fallbackUrl = "https://i.imgur.com/default-avatar.png" // link pubblico di default
+    // Fallback con immagine pubblica diretta (PNG/JPG)
+    const fallbackUrl = "https://i.imgur.com/0Qw7Y0H.png"
     const res = await fetch(fallbackUrl)
     userBuffer = Buffer.from(await res.arrayBuffer())
   }
@@ -128,7 +131,7 @@ let handler = async (m, { conn }) => {
     )
   } catch (e) {
     console.error(e)
-    m.reply("Errore nella generazione brainrot.")
+    m.reply("❌ Errore nella generazione brainrot.")
   }
 }
 
