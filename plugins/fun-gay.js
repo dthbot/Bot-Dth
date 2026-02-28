@@ -1,112 +1,130 @@
-import fetch from 'node-fetch';
-import { createCanvas, loadImage } from 'canvas';
+import fetch from 'node-fetch'
+import { createCanvas, loadImage } from 'canvas'
 
-// ------------------- FUNZIONI CANVAS ------------------- //
+async function applicaEffetto(m, conn, tipoEffetto, usedPrefix, command) {
+    let who = m.sender
 
-async function createNeonImage(name, profileUrl) {
-    const imgResponse = await fetch(profileUrl);
-    const buffer = await imgResponse.arrayBuffer();
-    const img = await loadImage(Buffer.from(buffer));
-
-    const canvas = createCanvas(img.width, img.height);
-    const ctx = canvas.getContext('2d');
-
-    ctx.drawImage(img, 0, 0);
-
-    const fontSize = Math.floor(img.width / 8);
-    ctx.font = `bold ${fontSize}px Arial`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    ctx.shadowColor = '#00FFFF';
-    ctx.shadowBlur = 25;
-    ctx.fillStyle = '#0FF';
-    ctx.fillText(name.toUpperCase(), img.width / 2, img.height / 2);
-
-    return canvas.toBuffer('image/png');
-}
-
-async function createPixelImage(profileUrl, pixelSize = 10) {
-    const imgResponse = await fetch(profileUrl);
-    const buffer = await imgResponse.arrayBuffer();
-    const img = await loadImage(Buffer.from(buffer));
-
-    const canvas = createCanvas(img.width, img.height);
-    const ctx = canvas.getContext('2d');
-
-    ctx.drawImage(img, 0, 0, img.width / pixelSize, img.height / pixelSize);
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(canvas, 0, 0, img.width / pixelSize, img.height / pixelSize, 0, 0, img.width, img.height);
-
-    return canvas.toBuffer('image/png');
-}
-
-async function createGlitterFrame(profileUrl) {
-    const imgResponse = await fetch(profileUrl);
-    const buffer = await imgResponse.arrayBuffer();
-    const img = await loadImage(Buffer.from(buffer));
-
-    const canvas = createCanvas(img.width, img.height);
-    const ctx = canvas.getContext('2d');
-
-    ctx.drawImage(img, 0, 0);
-
-    const frameWidth = img.width * 0.05;
-    for (let i = 0; i < 200; i++) {
-        ctx.fillStyle = `rgba(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, 255, 0.8)`;
-        const x = Math.random() * img.width;
-        const y = Math.random() * img.height;
-        if (x < frameWidth || x > img.width - frameWidth || y < frameWidth || y > img.height - frameWidth) {
-            ctx.fillRect(x, y, 2 + Math.random() * 3, 2 + Math.random() * 3);
-        }
+    const messaggiHelp = {
+        gay: `『 🏳️‍🌈 』 Rendi gay qualcuno\n\nEsempio: ${usedPrefix + command} @utente o rispondi a un messaggio`,
+        trans: `『 🏳️‍⚧️ 』 Rendi trans qualcuno\n\nEsempio: ${usedPrefix + command} @utente o rispondi a un messaggio`,
+        sborra: `『 💦 』 Effetto splash\n\nEsempio: ${usedPrefix + command} @utente o rispondi a un messaggio`
     }
 
-    return canvas.toBuffer('image/png');
-}
+    if (!m.quoted && !m.mentionedJid?.[0] && !m.sender)
+        return m.reply(messaggiHelp[tipoEffetto])
 
-// ------------------- HANDLER ------------------- //
-
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-    let who = m.quoted ? m.quoted.sender : m.mentionedJid?.[0] ? m.mentionedJid[0] : m.sender;
-    let name = text ? text.trim() : '';
-    
     try {
-        let profileUrl;
+        let nomeUtente
+        let bufferImmagine
+
+        // 🔥 PRIORITÀ:
+        // 1️⃣ Se quoto un'immagine → usa quella
         if (m.quoted?.mtype === 'imageMessage') {
-            const buffer = await m.quoted.download();
-            if (!buffer) throw new Error('Impossibile scaricare l\'immagine quotata');
-            profileUrl = buffer; // possiamo usare direttamente il buffer
-            name = name || (await conn.getName(m.quoted.sender));
+            bufferImmagine = await m.quoted.download()
+            nomeUtente = await conn.getName(m.quoted.sender)
         } else {
-            profileUrl = await conn.profilePictureUrl(who, 'image').catch(() => { throw new Error('L\'utente non ha una foto profilo!'); });
-            name = name || (await conn.getName(who));
+
+            // 2️⃣ Se rispondo a qualcuno → usa la sua foto profilo
+            if (m.quoted) who = m.quoted.sender
+
+            // 3️⃣ Se menziono qualcuno → usa la sua
+            if (m.mentionedJid?.[0]) who = m.mentionedJid[0]
+
+            nomeUtente = await conn.getName(who)
+
+            let pp = await conn.profilePictureUrl(who, 'image')
+                .catch(() => null)
+
+            if (!pp)
+                throw new Error("L'utente non ha una foto profilo!")
+
+            let risposta = await fetch(pp)
+            if (!risposta.ok)
+                throw new Error("Errore nel recupero della foto profilo")
+
+            bufferImmagine = await risposta.arrayBuffer()
         }
 
-        let bufferFinale;
-        switch (command.toLowerCase()) {
-            case 'neon':
-                bufferFinale = await createNeonImage(name, profileUrl);
-                break;
-            case 'pixel':
-                bufferFinale = await createPixelImage(profileUrl);
-                break;
-            case 'glitter':
-                bufferFinale = await createGlitterFrame(profileUrl);
-                break;
-            default:
-                return m.reply(`Comando non valido.`);
+        let bufferFinale = await applicaEffettiPride(bufferImmagine, tipoEffetto)
+
+        const messaggi = {
+            gay: [`${nomeUtente} ora è rainbow 🌈`],
+            trans: [`${nomeUtente} ha cambiato skin 🔥`],
+            sborra: [`${nomeUtente} è stato colpito 💦`]
         }
 
-        await conn.sendFile(m.chat, bufferFinale, `${command}.png`, '', m, false, { mentions: [who] });
+        let didascalia = `*${messaggi[tipoEffetto][Math.floor(Math.random() * messaggi[tipoEffetto].length)]}*`
+
+        await conn.sendFile(
+            m.chat,
+            bufferFinale,
+            `${tipoEffetto}.jpeg`,
+            didascalia,
+            m,
+            false,
+            { mentions: [who] }
+        )
 
     } catch (e) {
-        console.error(e);
-        await m.reply(`❌ Errore: ${e.message}`);
+        console.error(e)
+        m.reply(e.message || "Errore durante l'elaborazione.")
     }
-};
+}
 
-handler.help = ['neon', 'pixel', 'glitter'];
-handler.tags = ['effetti', 'giochi'];
-handler.command = /^(neon|pixel|glitter)$/i;
+async function applicaEffettiPride(bufferImmagine, tipoEffetto) {
+    let img = await loadImage(bufferImmagine)
 
-export default handler;
+    let canvas = createCanvas(img.width, img.height)
+    let ctx = canvas.getContext('2d')
+
+    ctx.drawImage(img, 0, 0)
+
+    const coloriPride = {
+        gay: ['#E40303', '#FF8C00', '#FFED00', '#008563', '#409CFF', '#955ABE'],
+        trans: ['#5BCEFA', '#F5A9B8', '#FFFFFF', '#F5A9B8', '#5BCEFA'],
+        sborra: ['#FFFFFF', '#E6F3FF', '#F0F8FF']
+    }
+
+    let colori = coloriPride[tipoEffetto]
+
+    if (tipoEffetto === 'sborra') {
+        for (let i = 0; i < 20; i++) {
+            ctx.beginPath()
+            ctx.arc(
+                Math.random() * img.width,
+                Math.random() * img.height,
+                Math.random() * 40 + 20,
+                0,
+                Math.PI * 2
+            )
+            ctx.fillStyle = colori[1] + 'AA'
+            ctx.fill()
+        }
+    } else {
+        ctx.globalAlpha = 0.45
+        const stripeHeight = img.height / colori.length
+
+        colori.forEach((colore, i) => {
+            ctx.fillStyle = colore
+            ctx.fillRect(0, i * stripeHeight, img.width, stripeHeight)
+        })
+
+        ctx.globalCompositeOperation = 'overlay'
+        ctx.drawImage(img, 0, 0)
+        ctx.globalCompositeOperation = 'source-over'
+        ctx.globalAlpha = 1
+    }
+
+    return canvas.toBuffer('image/jpeg')
+}
+
+let handler = async (m, { conn, usedPrefix, command }) => {
+    const tipoEffetto = command.toLowerCase()
+    await applicaEffetto(m, conn, tipoEffetto, usedPrefix, command)
+}
+
+handler.help = ['gay', 'trans', 'sborra']
+handler.tags = ['giochi']
+handler.command = /^(gay|trans|sborra)$/i
+
+export default handler
