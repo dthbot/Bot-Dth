@@ -30,24 +30,33 @@ export async function before(m, { conn, groupMetadata }) {
         ? `𝐌𝐢 𝐬𝐚 𝐜𝐡𝐞 @${cleanUserId} 𝐡𝐚 𝐪𝐮𝐢𝐭𝐭𝐚𝐭𝐨`
         : `@${cleanUserId} 𝐁𝐞𝐧𝐯𝐞𝐧𝐮𝐭𝐨 𝐬𝐮 ${groupName}`
 
-    // ======================
-    // PRENDI FOTO PROFILO
-    // ======================
-    let pp
+    // ==========================
+    // CONTROLLA FOTO PROFILO
+    // ==========================
+    let pp = null
     try {
         pp = await conn.profilePictureUrl(jid, 'image')
     } catch {
-        pp = 'https://i.imgur.com/6M5137b.png' // immagine fallback
+        pp = null
     }
 
-    // ======================
-    // INVIA CON THUMBNAIL
-    // ======================
-    await conn.sendMessage(m.chat, {
-        image: { url: pp },
-        caption,
-        mentions: [jid]
-    })
+    // ==========================
+    // INVIO
+    // ==========================
+    if (pp) {
+        // Con thumbnail
+        await conn.sendMessage(m.chat, {
+            image: { url: pp },
+            caption,
+            mentions: [jid]
+        })
+    } else {
+        // Solo testo
+        await conn.sendMessage(m.chat, {
+            text: caption,
+            mentions: [jid]
+        })
+    }
 
     return true
 }
