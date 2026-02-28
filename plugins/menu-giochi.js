@@ -19,6 +19,7 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 ➤ ${usedPrefix}intelligiometro 🧠
 ➤ ${usedPrefix}sborra 💦
 ➤ ${usedPrefix}il ♥️
+➤ ${usedPrefix}brainrot 🐒
 ➤ ${usedPrefix}wasted 🕴🏻
 `.trim(),
 
