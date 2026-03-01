@@ -1,29 +1,47 @@
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 var handler = async (m, { conn, isBotAdmin, isAdmin }) => {
-  // 1. Controllo permessi: solo per Admin del gruppo
-  if (!isAdmin) return m.reply('⚠️ Questo comando può essere utilizzato solo dagli amministratori del gruppo.')
-
-  // 2. Il bot deve essere admin per cambiare le impostazioni
-  if (!isBotAdmin) return m.reply('⚠️ Il bot deve essere admin per gestire l\'approvazione dei membri.')
+  if (!isAdmin) return m.reply('⚠️ Solo gli admin possono usare questo comando.')
+  if (!isBotAdmin) return m.reply('⚠️ Il bot deve essere admin per cambiare le impostazioni.')
 
   try {
-    // Disattiva l'approvazione (Entrata libera)
+    // Prova il metodo standard di Baileys
     await conn.groupUpdateMembershipApprovalMode(m.chat, 'off')
     
-    m.reply('🔓 *Approvazione DISATTIVATA*\nEntrata libera per 2 secondi...')
+    await conn.reply(m.chat, '🔓 *Approvazione DISATTIVATA*\nEntrata libera per 5 secondi...', m)
 
-    // Attesa di 2 secondi
-    await delay(2000)
+    // Aumentiamo a 5 secondi per dare tempo al server di elaborare
+    await delay(5000)
 
-    // Riattiva l'approvazione (Richiesta necessaria)
     await conn.groupUpdateMembershipApprovalMode(m.chat, 'on')
     
-    m.reply('🔒 *Approvazione RIATTIVATA*\nIl gruppo è di nuovo protetto.')
+    await conn.reply(m.chat, '🔒 *Approvazione RIATTIVATA*\nIl gruppo è di nuovo protetto.', m)
 
   } catch (e) {
-    console.error(e)
-    m.reply('❌ Errore durante il cambio delle impostazioni. Assicurati che il gruppo supporti l\'approvazione partecipanti.')
+    console.error("ERRORE_APPROVAZIONE:", e)
+    
+    // Tentativo alternativo se il primo fallisce
+    try {
+        await conn.query({
+            tag: 'iq',
+            attrs: {
+                to: m.chat,
+                type: 'set',
+                xmlns: 'w:g2',
+            },
+            content: [{
+                tag: 'membership_approval_mode',
+                attrs: {},
+                content: [{
+                    tag: 'group_join',
+                    attrs: { state: 'off' } // Prova a forzare lo stato
+                }]
+            }]
+        })
+        m.reply('⚠️ Metodo alternativo inviato, ma controlla se le impostazioni sono cambiate.')
+    } catch (e2) {
+        m.reply('❌ Errore critico: WhatsApp ha rifiutato il comando. Assicurati che l\'opzione "Approva nuovi partecipanti" sia visibile manualmente nelle info del gruppo.')
+    }
   }
 }
 
@@ -32,7 +50,7 @@ handler.tags = ['group']
 handler.command = ['accetta', 'acetta'] 
 
 handler.group = true
-handler.admin = true // <--- SOLO PER ADMIN
+handler.admin = true 
 handler.botAdmin = true
 
 export default handler
