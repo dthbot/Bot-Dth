@@ -35,8 +35,8 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 
 📢 𝐅𝐔𝐍𝐙𝐈𝐎𝐍𝐈 𝐒𝐏𝐄𝐂𝐈𝐀𝐋𝐈 (3/3)
 ➤ ${usedPrefix}bigtag 🏹 Tagga tutti spam
-➤ ${usedPrefix}mescolaadmin 🫨 Mescola gli admin
-➤ ${usedPrefix}ripristinaadmin 🚨 Tornano come prima 
+➤ ${usedPrefix}gruppi 🫨 Mostra i gruppi dove c'è il bot
+➤ ${usedPrefix}esci <numero> 🚨 Il bot esce dal gruppo indicato 
 ➤ ${usedPrefix}bonoir 🌙 Segna AFK
 ➤ ${usedPrefix}wakeywakey ✅ Toglie AFK
 ➤ ${usedPrefix}getpl 🗂️ Ti dà il plugin
