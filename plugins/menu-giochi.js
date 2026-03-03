@@ -40,6 +40,7 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 🎮 SEZIONE 3/3
 ➤ ${usedPrefix}impiccato 🪢
 ➤ ${usedPrefix}random <reply/tag> 🔮
+➤ ${usedPrefix}flame <reply/tag> 🔥
 ➤ ${usedPrefix}s / sticker 🏷️
 ➤ ${usedPrefix}wm 🔮
 ➤ ${usedPrefix}cur 🎶
