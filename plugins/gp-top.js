@@ -1,228 +1,119 @@
-import fs from 'fs'
+// Database globale
+globalThis.archivioMessaggi = globalThis.archivioMessaggi || {};
 
-const dbPath = './database.json'
+let handler = async (m, { conn, command }) => {
+  let chatId = m.chat;
+  let dati = globalThis.archivioMessaggi[chatId];
 
-// ============================
-// DATABASE
-// ============================
-
-function loadDB() {
-  if (!fs.existsSync(dbPath)) {
-    fs.writeFileSync(dbPath, JSON.stringify({ users: {}, groups: {} }, null, 2))
+  if (!dati || dati.totali === 0) {
+    return m.reply("📊 *CLASSIFICA MESSAGGI*\n\nNessun messaggio registrato oggi in questo gruppo.");
   }
 
-  let db = JSON.parse(fs.readFileSync(dbPath))
+  // Determina quanti utenti mostrare
+  let limite = 3;
+  if (command === "top5") limite = 5;
+  if (command === "top10") limite = 10;
 
-  if (!db.users) db.users = {}
-  if (!db.groups) db.groups = {}
+  let classifica = Object.entries(dati.utenti)
+    .sort((a, b) => b[1].conteggio - a[1].conteggio)
+    .slice(0, limite);
 
-  return db
-}
+  const medaglie = ['🥇','🥈','🥉','🏅','🏅','🏅','🏅','🏅','🏅','🏅'];
 
-function saveDB(db) {
-  fs.writeFileSync(dbPath, JSON.stringify(db, null, 2))
-}
+  let testo = `╭━━━〔 📊 *CLASSIFICA LIVE* 📊 〕━━━⬣\n`;
+  testo += `┃ 💬 Messaggi totali: *${dati.totali}*\n`;
+  testo += `┃ 📅 Aggiornata in tempo reale\n`;
+  testo += `╰━━━━━━━━━━━━━━━━━━⬣\n\n`;
+  testo += `🏆 *TOP ${limite} DI OGGI*\n\n`;
 
-// ============================
-// TRACKER MESSAGGI
-// ============================
+  let menzioni = [];
 
-export async function before(m) {
-  if (!m.isGroup) return
+  classifica.forEach((u, i) => {
+    let id = u[0];
+    let datiUtente = u[1];
+    menzioni.push(id);
+    testo += `${medaglie[i]} @${id.split("@")[0]}\n`;
+    testo += `   ✉️ ${datiUtente.conteggio} messaggi\n\n`;
+  });
 
-  let db = loadDB()
+  testo += `──────────────────\n`;
+  testo += `⏳ _Il conteggio si azzera a mezzanotte_`;
 
-  // init user
-  if (!db.users[m.sender]) {
-    db.users[m.sender] = {
-      todayMessages: 0,
-      totalMessages: 0
-    }
+  await conn.sendMessage(chatId, {
+    text: testo,
+    mentions: menzioni,
+    buttons: [
+      { buttonId: '.top5', buttonText: { displayText: '📊 TOP 5' }, type: 1 },
+      { buttonId: '.top10', buttonText: { displayText: '🏆 TOP 10' }, type: 1 }
+    ],
+    headerType: 1
+  }, { quoted: m });
+};
+
+// --- REGISTRAZIONE MESSAGGI ---
+handler.before = async function (m) {
+  if (!m.chat || !m.text || m.isBaileys || !m.isGroup) return; 
+
+  let chat = m.chat;
+  let user = m.sender;
+
+  if (!globalThis.archivioMessaggi[chat]) {
+    globalThis.archivioMessaggi[chat] = { totali: 0, utenti: {} };
   }
 
-  // init group
-  if (!db.groups[m.chat]) {
-    db.groups[m.chat] = {
-      todayMessages: 0
-    }
+  globalThis.archivioMessaggi[chat].totali += 1;
+
+  let nome = m.pushName || 'Utente';
+  if (!globalThis.archivioMessaggi[chat].utenti[user]) {
+    globalThis.archivioMessaggi[chat].utenti[user] = { nome: nome, conteggio: 0 };
   }
+  globalThis.archivioMessaggi[chat].utenti[user].conteggio += 1;
+};
 
-  db.users[m.sender].todayMessages++
-  db.users[m.sender].totalMessages++
-  db.groups[m.chat].todayMessages++
-
-  saveDB(db)
-}
-
-// ============================
-// COMANDO TOP
-// ============================
-
-let handler = async (m, { conn, command, usedPrefix }) => {
-
-  if (!m.isGroup)
-    return m.reply('❌ Solo nei gruppi.')
-
-  let db = loadDB()
-
-  let groupData = db.groups[m.chat] || { todayMessages: 0 }
-
-  let ranking = Object.entries(db.users)
-    .map(([jid, data]) => [jid, data.todayMessages || 0])
-    .filter(([_, total]) => total > 0)
-    .sort((a, b) => b[1] - a[1])
-
-  if (!ranking.length)
-    return m.reply('⚠️ Nessun messaggio oggi.')
-
-  let userPosition = ranking.findIndex(([jid]) => jid === m.sender) + 1
-  let totalGroupMessages = groupData.todayMessages || 0
-
-  // =========================
-  // 📊 STATS
-  // =========================
-  if (command === 'top') {
-
-    let text =
-`📊 *STATISTICHE DI OGGI*
-
-💬 Messaggi totali gruppo: ${totalGroupMessages}
-📍 Tua posizione: ${userPosition || 'Non classificato'}
-🗣️ Tu oggi: ${db.users[m.sender].todayMessages}
-
-🔥 Continua a scrivere per salire in classifica!`
-
-    const buttons = [
-      {
-        name: "quick_reply",
-        buttonParamsJson: JSON.stringify({
-          display_text: "🏆 Top 5",
-          id: `${usedPrefix}top5`
-        })
-      },
-      {
-        name: "quick_reply",
-        buttonParamsJson: JSON.stringify({
-          display_text: "🔟 Top 10",
-          id: `${usedPrefix}top10`
-        })
-      },
-      {
-        name: "quick_reply",
-        buttonParamsJson: JSON.stringify({
-          display_text: "🧹 Reset",
-          id: `${usedPrefix}resetday`
-        })
-      }
-    ]
-
-    return await conn.sendMessage(m.chat, {
-      text,
-      footer: '📊 Classifica Giornaliera',
-      interactiveButtons: buttons
-    }, { quoted: m })
-  }
-
-  // =========================
-  // 🏆 TOP 5
-  // =========================
-  if (command === 'top5') {
-
-    let top5 = ranking.slice(0, 5)
-    let medals = ['🥇','🥈','🥉','🏅','🏅']
-    let mentions = []
-
-    let text = '🏆 *TOP 5 DI OGGI*\n\n'
-
-    top5.forEach(([jid, total], i) => {
-      mentions.push(jid)
-      text += `${medals[i]} @${jid.split('@')[0]}\n`
-      text += `   💬 ${total} messaggi\n\n`
-    })
-
-    text += `📍 La tua posizione: ${userPosition || 'Non classificato'}`
-
-    return conn.sendMessage(m.chat, { text, mentions }, { quoted: m })
-  }
-
-  // =========================
-  // 🔟 TOP 10
-  // =========================
-  if (command === 'top10') {
-
-    let top10 = ranking.slice(0, 10)
-    let mentions = []
-
-    let text = '🔟 *TOP 10 DI OGGI*\n\n'
-
-    top10.forEach(([jid, total], i) => {
-      mentions.push(jid)
-      text += `${i+1}° @${jid.split('@')[0]}\n`
-      text += `   💬 ${total} messaggi\n\n`
-    })
-
-    text += `📍 La tua posizione: ${userPosition || 'Non classificato'}`
-
-    return conn.sendMessage(m.chat, { text, mentions }, { quoted: m })
-  }
-
-  // =========================
-  // 🧹 RESET MANUALE
-  // =========================
-  if (command === 'resetday') {
-
-    Object.keys(db.users).forEach(jid => {
-      db.users[jid].todayMessages = 0
-    })
-
-    db.groups[m.chat].todayMessages = 0
-
-    saveDB(db)
-
-    return m.reply('🧹 Classifica giornaliera resettata!')
-  }
-}
-
-handler.command = ['top','top5','top10','resetday']
-handler.tags = ['stats']
-handler.help = ['top']
-
-export default handler
-
-// ============================
-// 🌙 INVIO AUTOMATICO MEZZANOTTE
-// ============================
-
+// --- AUTOMAZIONE MEZZANOTTE ---
 setInterval(async () => {
-
-  const now = new Date()
-
+  let now = new Date();
   if (now.getHours() === 0 && now.getMinutes() === 0) {
 
-    let db = loadDB()
+    let gruppi = Object.keys(globalThis.archivioMessaggi);
 
-    for (let groupId in db.groups) {
+    for (let gid of gruppi) {
+      if (!globalThis.conn) continue;
 
-      let ranking = Object.entries(db.users)
-        .map(([jid, data]) => [jid, data.todayMessages || 0])
-        .filter(([_, total]) => total > 0)
-        .sort((a, b) => b[1] - a[1])
+      let dati = globalThis.archivioMessaggi[gid];
+      if (!dati || dati.totali === 0) continue;
 
-      if (!ranking.length) continue
+      let classifica = Object.entries(dati.utenti)
+        .sort((a, b) => b[1].conteggio - a[1].conteggio)
+        .slice(0, 3);
 
-      let text = '🌙 *CLASSIFICA FINALE DI OGGI*\n\n'
+      let testo = `🌙 ╭━━━〔 🏆 *PODIO FINALE* 🏆 〕━━━⬣\n`;
+      testo += `┃ 📊 Totale messaggi: *${dati.totali}*\n`;
+      testo += `╰━━━━━━━━━━━━━━━━━━⬣\n\n`;
 
-      ranking.slice(0,5).forEach(([jid, total], i) => {
-        text += `${i+1}° @${jid.split('@')[0]} - ${total} messaggi\n`
-      })
+      const medaglie = ['🥇','🥈','🥉'];
+      let menzioni = [];
 
-      await global.conn.sendMessage(groupId, {
-        text,
-        mentions: ranking.slice(0,5).map(x => x[0])
-      })
+      classifica.forEach((u, i) => {
+        menzioni.push(u[0]);
+        testo += `${medaglie[i]} @${u[0].split("@")[0]} — ${u[1].conteggio} messaggi\n`;
+      });
 
-      // NON resetta automaticamente
+      testo += `\nConteggio Azzerato`;
+
+      await globalThis.conn.sendMessage(gid, {
+        text: testo,
+        mentions: menzioni
+      });
+
+      globalThis.archivioMessaggi[gid] = { totali: 0, utenti: {} };
     }
   }
+}, 60000);
 
-}, 60000)
+handler.help = ['top','top5','top10'];
+handler.tags = ['strumenti'];
+handler.command = /^(top|top5|top10)$/i;
+handler.group = true;
+
+export default handler;
