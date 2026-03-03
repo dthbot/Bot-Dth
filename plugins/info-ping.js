@@ -1,4 +1,4 @@
-// Plugin ping migliorato (senza doppio messaggio) - by ChatGPT
+// Plugin fatto da dildo
 import os from 'os';
 
 let handler = async (m, { conn, usedPrefix }) => {
@@ -6,7 +6,6 @@ let handler = async (m, { conn, usedPrefix }) => {
     const uptimeMs = process.uptime() * 1000;
     const uptimeStr = clockString(uptimeMs);
 
-    // ✅ Ping reale (NO messaggi extra)
     const speed = await getRealPing(conn);
 
     const totalMem = os.totalmem();
@@ -17,7 +16,7 @@ let handler = async (m, { conn, usedPrefix }) => {
     const totalMemGB = (totalMem / 1024 / 1024 / 1024).toFixed(2);
     const usedMemGB = (usedMem / 1024 / 1024 / 1024).toFixed(2);
 
-    const botName = global.db?.data?.nomedelbot || "𝑑𝑎𝑛𝑔𝑒𝑟 𝑏𝑜𝑡";
+    const botName = global.db?.data?.nomedelbot || "𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓";
 
     const botStartTime = new Date(Date.now() - uptimeMs);
     const activationTime = botStartTime.toLocaleString('it-IT', {
@@ -30,7 +29,6 @@ let handler = async (m, { conn, usedPrefix }) => {
       year: 'numeric',
     });
 
-    // ✅ Extra info (aggiunte senza cambiare il resto)
     const wsState = getWsState(conn);
     const cores = os.cpus()?.length || 0;
     const load = os.loadavg ? os.loadavg() : [0, 0, 0];
@@ -78,7 +76,6 @@ let handler = async (m, { conn, usedPrefix }) => {
   }
 };
 
-// ✅ Ping reale senza inviare messaggi (niente doppio output)
 async function getRealPing(conn) {
   try {
     // WebSocket ping (se disponibile)
