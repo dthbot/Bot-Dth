@@ -43,12 +43,6 @@ let handler = async (m, { conn, usedPrefix }) => {
 │ 🕒 Uptime      : ${uptimeStr}
 ╰───────────────╯
 
-╭─❖ 「 💻 SISTEMA 」 ❖─╮
-│ 🧠 CPU Load    : ${loadStr}
-│ 🔢 Core CPU    : ${cores}
-│ 💾 RAM Uso     : ${percentUsed}%
-╰──────────────╯
-
 ╭─❖ 「 📅 ATTIVAZIONE 」 ❖─╮
 │ 🟢 Attivo : ${activationTime}
 ╰───────────────╯
@@ -58,12 +52,11 @@ let handler = async (m, { conn, usedPrefix }) => {
 ╰───────────╯
 
 ╚═══════════════╝
-      🚀 𝑻𝒖𝒕𝒕𝒊 𝒊 𝒔𝒊𝒔𝒕𝒆𝒎𝒊 𝒐𝒑𝒆𝒓𝒂𝒕𝒊𝒗𝒊 🚀
 `.trim();
 
     await conn.sendMessage(m.chat, {
       text: textMsg,
-      footer: "PING BY DANGER BOT",
+      footer: "🚀 𝑻𝒖𝒕𝒕𝒊 𝒊 𝒔𝒊𝒔𝒕𝒆𝒎𝒊 𝒐𝒑𝒆𝒓𝒂𝒕𝒊𝒗𝒊 🚀",
       buttons: [
         { buttonId: usedPrefix + "ping", buttonText: { displayText: "📡 𝐑𝐢𝐟𝐚𝐢 𝐏𝐢𝐧𝐠" }, type: 1 },
         { buttonId: usedPrefix + "menu", buttonText: { displayText: "📋 𝐌𝐞𝐧𝐮" }, type: 1 }
