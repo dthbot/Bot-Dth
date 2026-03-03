@@ -2,114 +2,196 @@ import fetch from 'node-fetch'
 
 const handler = async (m, { conn, usedPrefix, command }) => {
   if (!m.isGroup) {
-    return m.reply('⚠️ Questo comando può essere usato solo nei gruppi per più divertimento!');
+    return m.reply('⚠️ Questo comando può essere usato solo nei gruppi!');
   }
 
-  // Lista di persone "sconosciute" / nomi creativi
-  const mysteriousPeople = [
-    { name: "🧩 Enigma", desc: "il misterioso risolutore di puzzle" },
-    { name: "🌌 Nebula", desc: "la viaggiatrice spaziale" },
-    { name: "⚡ Volt", desc: "il maestro dell'elettricità" },
-    { name: "🍃 Zephyr", desc: "il signore dei venti" },
-    { name: "🔮 Oracle", desc: "la veggente del gruppo" },
-    { name: "🎭 Mimic", desc: "il cambiaforme" },
-    { name: "🧪 Chemico", desc: "lo scienziato pazzo" },
-    { name: "📡 Pixel", desc: "l'hacker ombra" },
-    { name: "🎸 Lyra", desc: "la musicista misteriosa" },
-    { name: "📚 Biblos", desc: "il guardiano dei segreti" },
-    { name: "🎨 Chroma", desc: "l'artista dei colori" },
-    { name: "🧘 Yogi", desc: "il maestro spirituale" },
-    { name: "🎪 Circus", desc: "l'intrattenitore folle" },
-    { name: "🌙 Luna", desc: "la custode dei sogni" },
-    { name: "⚙️ Gears", desc: "l'inventore steampunk" },
-    { name: "🎭 Mask", desc: "il mimo senza volto" },
-    { name: "🌋 Ember", desc: "la signora del fuoco" },
-    { name: "❄️ Frost", desc: "il gelido viaggiatore" },
-    { name: "🌀 Echo", desc: "la voce del passato" },
-    { name: "🎲 Dice", desc: "il giocatore d'azzardo" }
+  // Lista di persone "sconosciute" nelle community WhatsApp
+  const unknownPeople = [
+    { 
+      name: "👤 Marco92", 
+      desc: "quello che ha l'immagine predefinita da 3 anni",
+      community: "Gruppi di scambio",
+      lastSeen: "10 minuti fa"
+    },
+    { 
+      name: "👤 Giulia__", 
+      desc: "legge ma non risponde mai",
+      community: "Community libri",
+      lastSeen: "2 ore fa" 
+    },
+    { 
+      name: "👤 User12345", 
+      desc: "il classico numero internazionale",
+      community: "Gruppi spam",
+      lastSeen: "ieri" 
+    },
+    { 
+      name: "👤 Alessandro", 
+      desc: "ha la spunta blu ma non si sa chi sia",
+      community: "Vari gruppi",
+      lastSeen: "3 giorni fa" 
+    },
+    { 
+      name: "👤 Sara", 
+      desc: "cambia foto profilo ogni settimana",
+      community: "Community gossip",
+      lastSeen: "online ora" 
+    },
+    { 
+      name: "👤 +39 *** *** **90", 
+      desc: "numero nascosto, nessuno lo conosce",
+      community: "Mistero totale",
+      lastSeen: "mai online" 
+    },
+    { 
+      name: "👤 Luca", 
+      desc: "manda solo auguri a Natale",
+      community: "Parenti lontani",
+      lastSeen: "8 mesi fa" 
+    },
+    { 
+      name: "👤 Fra", 
+      desc: "quello che c'è in 100 gruppi",
+      community: "Tutte le community",
+      lastSeen: "sempre online" 
+    },
+    { 
+      name: "👤 Anonimo", 
+      desc: "ha disattivato l'ultimo accesso",
+      community: "Ghost mode",
+      lastSeen: "nascosto" 
+    },
+    { 
+      name: "👤 Nonno_45", 
+      desc: "manda buongiorno ogni mattina",
+      community: "Gruppi famiglia",
+      lastSeen: "5 minuti fa" 
+    },
+    { 
+      name: "👤 _unknown_", 
+      desc: "nome utente tutto in minuscolo",
+      community: "Community tech",
+      lastSeen: "2 settimane fa" 
+    },
+    { 
+      name: "👤 Missim", 
+      desc: "quello che ti compare nei suggeriti",
+      community: "Contatti suggeriti",
+      lastSeen: "sconosciuto" 
+    },
+    { 
+      name: "👤 Silvia", 
+      desc: "ha 2 spunte blu ma non parla mai",
+      community: "Gruppi silenziosi",
+      lastSeen: "letto" 
+    }
   ];
 
   // Seleziona una persona casuale
-  const randomPerson = mysteriousPeople[Math.floor(Math.random() * mysteriousPeople.length)];
+  const randomUnknown = unknownPeople[Math.floor(Math.random() * unknownPeople.length)];
   
-  // Genera percentuale di "calcolo" casuale
-  const calculationPercent = Math.floor(Math.random() * 101);
+  // Genera percentuale di "mistero" casuale
+  const mysteryPercent = Math.floor(Math.random() * 101);
+  
+  // Genera numeri casuali per info WhatsApp
+  const groupsCount = Math.floor(Math.random() * 50) + 1;
+  const mutualGroups = Math.floor(Math.random() * groupsCount);
+  const commonContacts = Math.floor(Math.random() * 20);
   
   // Crea la barra di caricamento
-  const loadingBar = createLoadingBar(calculationPercent, 15);
+  const loadingBar = createLoadingBar(mysteryPercent, 15);
   
-  // Crea il messaggio principale
-  const mainMessage = `
+  // Messaggio iniziale con barra
+  const initialMsg = `
 ╔══════════════════════╗
-   🎲 *RICERCA RANDOMICA* 🎲
+   🕵️ *WHATSAPP UNKNOWN* 🕵️
 ╚══════════════════════╝
 
-🔍 *Calcolo in corso...*
+🔎 *Scansionando community...*
+📱 *Analizzando partecipanti...*
 
 ${loadingBar}
 
-📊 *Progresso:* ${calculationPercent}%
+📊 *Mistero rilevato:* ${mysteryPercent}%
+👥 *Gruppi analizzati:* ${groupsCount}
   `;
 
-  // Invia primo messaggio con la barra
   const sentMsg = await conn.sendMessage(m.chat, { 
-    text: mainMessage,
+    text: initialMsg,
     contextInfo: {
       mentionedJid: [m.sender],
       externalAdReply: {
-        title: '🎰 SISTEMA DI RANDOMIZZAZIONE',
-        body: 'Elaborazione dati in corso...',
+        title: '🔍 SISTEMA DI RICERCA',
+        body: 'Cercando utenti misteriosi...',
         mediaType: 1,
         renderLargerThumbnail: false,
-        thumbnailUrl: 'https://telegra.ph/file/your-image-link.jpg' // Metti un'immagine carina
+        thumbnailUrl: 'https://telegra.ph/file/9e123d8b0b9c9a7d3b5f4.jpg' // Metti un'immagine carina
       }
     }
   }, { quoted: m });
 
   // Simula elaborazione
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise(resolve => setTimeout(resolve, 2500));
 
-  // Secondo messaggio con il risultato
+  // Calcola statistiche basate sulla percentuale
+  const activityLevel = getActivityLevel(mysteryPercent);
+  const riskLevel = getRiskLevel(mysteryPercent);
+  const mysteryEmoji = getMysteryEmoji(mysteryPercent);
+
+  // Risultato finale
   const resultMessage = `
 ╔══════════════════════╗
-   🎉 *PERSONA TROVATA* 🎉
+   🕵️ *UTENTE TROVATO* 🕵️
 ╚══════════════════════╝
 
-👤 *Nome:* ${randomPerson.name}
-📝 *Descrizione:* ${randomPerson.desc}
-
-📈 *Affinità con il gruppo:* ${calculationPercent}%
-${getAffinityEmoji(calculationPercent)}
-
-⚡ *Potere speciale:* ${getSpecialPower()}
-🎯 *Rarità:* ${getRarity(calculationPercent)}
-💫 *Stato:* ${getStatus(calculationPercent)}
+📱 *PROFILO:*
+${randomUnknown.name} │ ${randomUnknown.desc}
 
 ━━━━━━━━━━━━━━━━━━━
-✨ *Sei stato accoppiato con:* 
-   ${randomPerson.name}
+📊 *STATISTICHE WHATSAPP:*
 
-💬 *Messaggio segreto:*
-"${getSecretMessage(randomPerson.name)}"
+👥 *Gruppi in comune:* ${mutualGroups}
+👤 *Contatti in comune:* ${commonContacts}
+🏘️ *Community principale:* ${randomUnknown.community}
+⏰ *Ultimo accesso:* ${randomUnknown.lastSeen}
+
+━━━━━━━━━━━━━━━━━━━
+🔮 *LIVELLO MISTERO:* ${mysteryPercent}% ${mysteryEmoji}
+${getMysteryDescription(mysteryPercent)}
+
+📈 *Attività:* ${activityLevel}
+⚠️ *Rischio ghost:* ${riskLevel}
+
+━━━━━━━━━━━━━━━━━━━
+💬 *COSA DICE LA COMMUNITY:*
+
+"${getWhatsAppGossip(randomUnknown.name, mysteryPercent)}"
+
+${getRandomHashtag()}
   `.trim();
 
-  // Bottoni interattivi (dove supportati)
+  // Bottoni interattivi
   const buttons = [
     { 
       buttonId: `${usedPrefix}random`, 
-      buttonText: { displayText: '🎲 NUOVO RANDOM' }, 
+      buttonText: { displayText: '🔄 NUOVO MISTERO' }, 
       type: 1 
     },
     { 
-      buttonId: `${usedPrefix}randomdetails`, 
-      buttonText: { displayText: '🔍 ALTRI DETTAGLI' }, 
+      buttonId: `${usedPrefix}randomprofile`, 
+      buttonText: { displayText: '🔍 VEDI FOTO PROFILO' }, 
+      type: 1 
+    },
+    { 
+      buttonId: `${usedPrefix}randomstory`, 
+      buttonText: { displayText: '📖 STORIA COMPLETA' }, 
       type: 1 
     }
   ];
 
   const buttonMessage = {
     text: resultMessage,
-    footer: '🎮 Gioca ancora!',
+    footer: '🕵️ Unknown WhatsApp - Scopri chi si nasconde nei gruppi',
     buttons: buttons,
     headerType: 1,
     mentions: [m.sender]
@@ -118,21 +200,38 @@ ${getAffinityEmoji(calculationPercent)}
   await conn.sendMessage(m.chat, buttonMessage, { quoted: sentMsg });
 };
 
-// Comando per dettagli aggiuntivi
-const detailsHandler = async (m, { conn }) => {
-  const details = [
-    "🌟 *CURIOSITÀ:* Questa persona esiste in 3 dimensioni parallele!",
-    "📜 *LEGGENDA:* Si dice che appaia solo quando si pronuncia il suo nome 3 volte...",
-    "🌍 *PROVENIENZA:* Dal continente perduto di Atlantide",
-    "🎭 *TRAGUARDI:* Ha vinto 1000 battaglie di sguardi",
-    "🌈 *COLORE PREFERITO:* Quello che non esiste",
-    "⏰ *ETÀ:* Più vecchio del tempo stesso",
-    "🎵 *CANZONE PREFERITA:* Quella che senti solo nei sogni"
+// Comando per vedere la "foto profilo" (descrizione divertente)
+const profileHandler = async (m, { conn }) => {
+  const profiles = [
+    "📸 *FOTO PROFILO:* Una silhouette nera, classico profilo misterioso",
+    "📸 *FOTO PROFILO:* Il sole su una spiaggia, probabilmente presa da Google",
+    "📸 *FOTO PROFILO:* Un gatto nero, 99% non è il suo gatto",
+    "📸 *FOTO PROFILO:* Fiore viola, molto basic",
+    "📸 *FOTO PROFILO:* Icona predefinita di WhatsApp, il vero mistero",
+    "📸 *FOTO PROFILO:* Famoso attore, probabilmente ci prova",
+    "📸 *FOTO PROFILO:* Paesaggio montano, cerca avventure",
+    "📸 *FOTO PROFILO:* Emoji gigante, nulla di che"
   ];
   
-  const randomDetail = details[Math.floor(Math.random() * details.length)];
+  const randomProfile = profiles[Math.floor(Math.random() * profiles.length)];
   
-  await m.reply(`🔍 *DETTAGLI AGGIUNTIVI*\n\n${randomDetail}`);
+  await m.reply(`🕵️ *PROFILO MISTERIOSO*\n\n${randomProfile}`);
+};
+
+// Comando per la "storia completa"
+const storyHandler = async (m, { conn }) => {
+  const stories = [
+    "📖 Questo utente è stato aggiunto a 50 gruppi nel 2020 e da allora non ha mai detto una parola. Leggenda vuole che sia ancora in ascolto...",
+    "📖 Si unisce ai gruppi, legge tutto, salva i media, e sparisce. Il fantasma di WhatsApp.",
+    "📖 Ha la foto profilo di una persona famosa, nessuno sa chi sia veramente. Alcuni dicono sia un bot.",
+    "📖 Era attivissimo nel 2019, poi un giorno scomparve. Il suo ultimo messaggio fu 'ciao'.",
+    "📖 Compare solo nei gruppi di scambio libri, ma non ha mai letto un libro in vita sua.",
+    "📖 Ha 3 numeri di telefono diversi e in ogni gruppo ne usa uno diverso."
+  ];
+  
+  const randomStory = stories[Math.floor(Math.random() * stories.length)];
+  
+  await m.reply(`${randomStory}`);
 };
 
 // Funzioni di supporto
@@ -146,69 +245,84 @@ function createLoadingBar(percent, length = 15) {
   return `┃${filledBar}${emptyBar}┃`;
 }
 
-function getAffinityEmoji(percent) {
-  if (percent >= 80) return '💞 *Anima gemella cosmica!*';
-  if (percent >= 60) return '💖 *Fortissima connessione!*';
-  if (percent >= 40) return '💛 *Buona amicizia*';
-  if (percent >= 20) return '💙 *Conoscenza superficiale*';
-  return '🖤 *Completi sconosciuti*';
+function getMysteryEmoji(percent) {
+  if (percent >= 80) return '👻';
+  if (percent >= 60) return '🕵️';
+  if (percent >= 40) return '🤔';
+  if (percent >= 20) return '😐';
+  return '😎';
 }
 
-function getSpecialPower() {
-  const powers = [
-    'Lettura del pensiero 🧠',
-    'Viaggio nel tempo ⏰',
-    'Invisibilità 👻',
-    'Parlare con gli animali 🐾',
-    'Controllo del meteo ☁️',
-    'Teletrasporto ✨',
-    'Guarigione istantanea 💚',
-    'Manipolazione dei sogni 💭',
-    'Fortuna infinita 🍀',
-    'Memoria fotografica 📸'
+function getMysteryDescription(percent) {
+  if (percent >= 80) return '└ *LEGGENDA:* Nessuno sa chi sia veramente';
+  if (percent >= 60) return '└ *MISTERO:* Pochi lo hanno visto online';
+  if (percent >= 40) return '└ *NORMALE:* Utente standard di WhatsApp';
+  if (percent >= 20) return '└ *CHIARO:* Si vede spesso in giro';
+  return '└ *NOTO:* Praticamente una celebrità';
+}
+
+function getActivityLevel(percent) {
+  if (percent >= 80) return '💤 *Spento* - Mai online';
+  if (percent >= 60) return '🌙 *Ghost* - Solo notte fonda';
+  if (percent >= 40) return '📱 *Moderato* - Ogni tanto si vede';
+  if (percent >= 20) return '☀️ *Attivo* - Risponde sempre';
+  return '⚡ *Super attivo* - 24/7 online';
+}
+
+function getRiskLevel(percent) {
+  if (percent >= 80) return '🔴 *Altissimo* - Fantasma totale';
+  if (percent >= 60) return '🟠 *Alto* - Quasi invisibile';
+  if (percent >= 40) return '🟡 *Medio* - Si fa vedere';
+  if (percent >= 20) return '🟢 *Basso* - Profilo chiaro';
+  return '🔵 *Minimo* - Troppo conosciuto';
+}
+
+function getWhatsAppGossip(name, percent) {
+  const gossips = [
+    `"Ho visto ${name} in 15 gruppi diversi, non parla mai ma c'è sempre"`,
+    `"Dicono che ${name} abbia 3 account WhatsApp diversi"`,
+    `"La foto profilo di ${name} è la stessa da 5 anni, rispetto"`,
+    `"Qualcuno ha mai ricevuto un messaggio da ${name}? Io no"`,
+    `"${name} è il classico utente che aggiungi e poi dimentichi"`,
+    `"Secondo me ${name} è un bot creato da WhatsApp per monitorare i gruppi"`,
+    `"Ho sognato ${name} una volta, ci ha parlato? No"`,
+    `"Si dice che ${name} sappia tutto di tutti, ma nessuno sa nulla di lui/lei"`,
+    `"Mio cugino conosce ${name}, ma non vuole dirmi chi è"`,
+    `"Se guardi bene, ${name} è in tutti i gruppi da cui sei uscito"`,
+    `"La vera domanda è: ${name} esiste veramente?"`
   ];
-  return powers[Math.floor(Math.random() * powers.length)];
+  
+  if (percent > 90) {
+    return `🚨 *ALLARME MISTERO:* ${gossips[Math.floor(Math.random() * gossips.length)]}`;
+  }
+  
+  return gossips[Math.floor(Math.random() * gossips.length)];
 }
 
-function getRarity(percent) {
-  if (percent >= 90) return '⚡ LEGGENDARIO ⚡';
-  if (percent >= 70) return '💎 EPICO 💎';
-  if (percent >= 50) return '🌟 RARO 🌟';
-  if (percent >= 30) return '📦 COMUNE 📦';
-  return '🔄 ONNIPRESENTE 🔄';
-}
-
-function getStatus(percent) {
-  if (percent >= 80) return '🟢 Attivo nella tua dimensione';
-  if (percent >= 50) return '🟡 In viaggio tra mondi';
-  if (percent >= 20) return '🟠 In fase di manifestazione';
-  return '🔴 Stato: Sconosciuto';
-}
-
-function getSecretMessage(name) {
-  const messages = [
-    `A volte le persone più speciali sono quelle che non conosciamo ancora... come ${name}`,
-    `Si dice che ${name} appaia solo a chi ci crede veramente`,
-    `Ho visto ${name} ballare sotto la pioggia con 1000 ombrelli colorati`,
-    `${name} mi ha sussurrato: "Il segreto della felicità è condividere un 🎲 random con gli amici"`,
-    `Leggenda narra che ${name} abbia insegnato ai gatti a miagolare in 50 lingue diverse`,
-    `${name} sta organizzando una festa e sei invitato! Porta solo 🧦 spaiati`,
-    `Il superpotere segreto di ${name}? Far sorridere chi è triste con un semplice messaggio`,
-    `Nella prossima vita, ${name} sarà un 🌈 unicorno digitalo proprio come te!`
+function getRandomHashtag() {
+  const hashtags = [
+    '#UtenteMisterioso', '#WhatsAppGhost', '#MaiVistoOnline',
+    '#ChiSaràMai', '#LeggendaWhatsApp', '#ProfiloMistero',
+    '#Sconosciuto', '#GhostMode', '#SoloInGruppo',
+    '#MisteroDellaFede', '#MaiUnaParola', '#LettoreSilenzioso',
+    '#PresenteMaAssente', '#Enigma', '#ChiÈCostui'
   ];
-  return messages[Math.floor(Math.random() * messages.length)];
+  
+  return `\n${hashtags[Math.floor(Math.random() * hashtags.length)]}`;
 }
 
 // Handler principale
-handler.help = ['random - Scopri una persona misteriosa'];
+handler.help = ['random - Scopri un utente misterioso delle community WhatsApp'];
 handler.tags = ['fun'];
-handler.command = ['random', 'randomdetails'];
+handler.command = ['random', 'randomprofile', 'randomstory'];
 handler.group = true;
 
 // Gestione sottocomandi
 handler.execute = async (m, { conn, usedPrefix, command }) => {
-  if (command === 'randomdetails') {
-    await detailsHandler(m, { conn });
+  if (command === 'randomprofile') {
+    await profileHandler(m, { conn });
+  } else if (command === 'randomstory') {
+    await storyHandler(m, { conn });
   } else {
     await handler(m, { conn, usedPrefix, command });
   }
