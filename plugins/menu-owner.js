@@ -1,83 +1,58 @@
 const handler = async (message, { conn, usedPrefix = '.' }) => {
 
-    const args = message.text.split(' ')[1] || '1';
+const testo = `
+╔══════════════════════╗
+   🌩️ 𝐍𝚵𝑿𝐒𝐔𝐒 – 𝐎𝐖𝐍𝐄𝐑 𝐏𝐀𝐍𝐄𝐋 🌩️
+╚══════════════════════╝
 
-    const sezioni = {
+━━━━━━━━━━━━━━━━━━━━
+🚫 𝐆𝐄𝐒𝐓𝐈𝐎𝐍𝐄 𝐔𝐓𝐄𝐍𝐓𝐈 👥
+━━━━━━━━━━━━━━━━━━━━
 
-        1: `
-🌩️ 𝐍𝚵𝑿𝐒𝐔𝐒 – 𝐌𝐄𝐍𝐔 𝐎𝐖𝐍𝐄𝐑 ⚡
-════════════════════
+🔇 ➤ ${usedPrefix}banuser  
+🔊 ➤ ${usedPrefix}unbanuser  
+🛡️ ➤ ${usedPrefix}addmod  
+❌ ➤ ${usedPrefix}delmod  
+🗑️ ➤ ${usedPrefix}resetmod  
 
-🚫 𝐆𝐄𝐒𝐓𝐈𝐎𝐍𝐄 𝐔𝐓𝐄𝐍𝐓𝐈 (1/3)
-➤ ${usedPrefix}banuser 🔇 Blocca utente dal bot
-➤ ${usedPrefix}unbanuser 🔊 Sblocca utente dal bot
-➤ ${usedPrefix}addmod 🔉 Da moderatore
-➤ ${usedPrefix}delmod 🚨 Togli moderatore
-➤ ${usedPrefix}resetmod 🗑️ Resetta tutti i moderatori
-`.trim(),
 
-        2: `
-🌩️ 𝐍𝚵𝑿𝐒𝐔𝐒 – 𝐌𝐄𝐍𝐔 𝐎𝐖𝐍𝐄𝐑 ⚡
-════════════════════
+━━━━━━━━━━━━━━━━━━━━
+🤖 𝐆𝐄𝐒𝐓𝐈𝐎𝐍𝐄 𝐁𝐎𝐓 ⚙️
+━━━━━━━━━━━━━━━━━━━━
 
-🤖 𝐆𝐄𝐒𝐓𝐈𝐎𝐍𝐄 𝐁𝐎𝐓 (2/3)
-➤ ${usedPrefix}join + link ⚠️ Fai entrare il bot
-➤ ${usedPrefix}reimpostagp 💾 Reimposta link gruppo
-➤ ${usedPrefix}tuttigp 🚨 Messaggio in tutti i gruppi
-➤ ${usedPrefix}getid (link gp) 🆔 Ottieni ID gruppo
-➤ ${usedPrefix}out 👋 Fai uscire il bot
-➤ ${usedPrefix}aggiorna 🌐 Aggiorna bot
-`.trim(),
+📥 ➤ ${usedPrefix}join + link  
+💾 ➤ ${usedPrefix}reimpostagp  
+📢 ➤ ${usedPrefix}tuttigp  
+🆔 ➤ ${usedPrefix}getid (link gp)  
+👋 ➤ ${usedPrefix}out  
+🌐 ➤ ${usedPrefix}aggiorna  
 
-        3: `
-🌩️ 𝐍𝚵𝑿𝐒𝐔𝐒 – 𝐌𝐄𝐍𝐔 𝐎𝐖𝐍𝐄𝐑 ⚡
-════════════════════
 
-📢 𝐅𝐔𝐍𝐙𝐈𝐎𝐍𝐈 𝐒𝐏𝐄𝐂𝐈𝐀𝐋𝐈 (3/3)
-➤ ${usedPrefix}bigtag 🏹 Tagga tutti spam
-➤ ${usedPrefix}gruppi 🫨 Mostra i gruppi dove c'è il bot
-➤ ${usedPrefix}esci <numero> 🚨 Il bot esce dal gruppo indicato 
-➤ ${usedPrefix}bonoir 🌙 Segna AFK
-➤ ${usedPrefix}wakeywakey ✅ Toglie AFK
-➤ ${usedPrefix}getpl 🗂️ Ti dà il plugin
+━━━━━━━━━━━━━━━━━━━━
+📢 𝐅𝐔𝐍𝐙𝐈𝐎𝐍𝐈 𝐒𝐏𝐄𝐂𝐈𝐀𝐋𝐈 ✨
+━━━━━━━━━━━━━━━━━━━━
 
-════════════════════
-🔖 Versione: *1.0*
-`.trim()
-    };
+🏹 ➤ ${usedPrefix}bigtag  
+📂 ➤ ${usedPrefix}gruppi  
+🚪 ➤ ${usedPrefix}esci <numero>  
+🌙 ➤ ${usedPrefix}bonoir  
+☀️ ➤ ${usedPrefix}wakeywakey  
+🗂️ ➤ ${usedPrefix}getpl  
 
-    const sezioneAttuale = parseInt(args);
-    const testo = sezioni[sezioneAttuale];
-    if (!testo) return;
 
-    let buttons = [];
+━━━━━━━━━━━━━━━━━━━━
+🔖 𝐕𝐞𝐫𝐬𝐢𝐨𝐧𝐞: 1.0 🚀
+━━━━━━━━━━━━━━━━━━━━
+`.trim();
 
-    if (sezioneAttuale < 3) {
-        buttons.push({
-            buttonId: `${usedPrefix}owner ${sezioneAttuale + 1}`,
-            buttonText: { displayText: "➡️ Prossima Sezione" },
-            type: 1
-        });
-    }
+await conn.sendMessage(message.chat, {
+    text: testo
+});
 
-    if (sezioneAttuale > 1) {
-        buttons.push({
-            buttonId: `${usedPrefix}owner ${sezioneAttuale - 1}`,
-            buttonText: { displayText: "⬅️ Sezione Precedente" },
-            type: 1
-        });
-    }
-
-    await conn.sendMessage(message.chat, {
-        text: testo,
-        footer: "MENU OWNER",
-        buttons: buttons,
-        headerType: 1
-    });
 };
 
 handler.help = ['owner'];
 handler.tags = ['menu'];
-handler.command = /^(owner)(\s\d+)?$/i;
+handler.command = /^(owner)$/i;
 
 export default handler;
