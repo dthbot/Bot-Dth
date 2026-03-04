@@ -1,96 +1,61 @@
 const handler = async (message, { conn, usedPrefix = '.' }) => {
 
-    const userCount = Object.keys(global.db?.data?.users || {}).length;
-    const args = message.text.split(' ')[1] || '1';
+const userCount = Object.keys(global.db?.data?.users || {}).length;
 
-    const sezioni = {
-        1: `
-🩸 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 *MENU GIOCHI* 🩸
-════════════════════
-👥 Utenti registrati: *${userCount}*
-════════════════════
+const testo = `
+╔═══════════════╗
+   🎮 𝐌𝐄𝐍𝐔 𝐆𝐈𝐎𝐂𝐇𝐈 🩸
+╚═══════════════╝
 
-🎮 SEZIONE 1/3
-➤ ${usedPrefix}bellometro 🥰
-➤ ${usedPrefix}gaymetro 🌈
-➤ ${usedPrefix}lesbiometro 💖
-➤ ${usedPrefix}masturbometro 🍆
-➤ ${usedPrefix}fortunometro 🍀
-➤ ${usedPrefix}intelligiometro 🧠
-➤ ${usedPrefix}sborra 💦
-➤ ${usedPrefix}il ♥️
-➤ ${usedPrefix}wasted 🕴🏻
-`.trim(),
+👥 𝐔𝐭𝐞𝐧𝐭𝐢 𝐫𝐞𝐠𝐢𝐬𝐭𝐫𝐚𝐭𝐢: *${userCount}*
 
-        2: `
-🎮 SEZIONE 2/3
-➤ ${usedPrefix}comunista 💂🏻
-➤ ${usedPrefix}bisex 👙
-➤ ${usedPrefix}gay 🏳️‍🌈
-➤ ${usedPrefix}simpcard 🃏
-➤ ${usedPrefix}trans 🏳️‍⚧️
-➤ ${usedPrefix}tris ❌⭕
-➤ ${usedPrefix}meme 🤣
-➤ ${usedPrefix}cibo 🍣
-➤ ${usedPrefix}bandiera 🚩
-➤ ${usedPrefix}classificabandiera 🏆
-`.trim(),
+━━━━━━━━━━━━
+🕹️ 𝐆𝐈𝐎𝐂𝐇𝐈
+━━━━━━━━━━━━
 
-        3: `
-🎮 SEZIONE 3/3
-➤ ${usedPrefix}impiccato 🪢
-➤ ${usedPrefix}random <reply/tag> 🔮
-➤ ${usedPrefix}flame <reply/tag> 🔥
-➤ ${usedPrefix}s / sticker 🏷️
-➤ ${usedPrefix}wm 🔮
-➤ ${usedPrefix}cur 🎶
-➤ ${usedPrefix}onlyfans <nome> 🩵🤍
-➤ ${usedPrefix}curriculum 💼
-➤ ${usedPrefix}shop 🏬
-➤ ${usedPrefix}sposa 👰🏻
-➤ ${usedPrefix}divorzia 💔
-➤ ${usedPrefix}amante 🫂
-➤ ${usedPrefix}adotta 👶🏻
-➤ ${usedPrefix}famiglia 🧑‍🧑‍🧒‍🧒
-➤ ${usedPrefix}toglifiglio 👣
-➤ ${usedPrefix}togliamante 💔
-════════════════════
-`.trim()
-    };
+❌⭕ ➤ ${usedPrefix}𝐭𝐫𝐢𝐬  
+🪢 ➤ ${usedPrefix}𝐢𝐦𝐩𝐢𝐜𝐜𝐚𝐭𝐨  
+🤣 ➤ ${usedPrefix}𝐦𝐞𝐦𝐞  
+🍣 ➤ ${usedPrefix}𝐜𝐢𝐛𝐨  
+🚩 ➤ ${usedPrefix}𝐛𝐚𝐧𝐝𝐢𝐞𝐫𝐚  
+🏆 ➤ ${usedPrefix}𝐜𝐥𝐚𝐬𝐬𝐢𝐟𝐢𝐜𝐚𝐛𝐚𝐧𝐝𝐢𝐞𝐫𝐚  
 
-    const sezioneAttuale = parseInt(args);
-    const testo = sezioni[sezioneAttuale];
+━━━━━━━━━━━
+🎲 𝐅𝐔𝐍
+━━━━━━━━━━━
 
-    if (!testo) return;
+🔮 ➤ ${usedPrefix}𝐫𝐚𝐧𝐝𝐨𝐦 <reply/tag>  
+🔥 ➤ ${usedPrefix}𝐟𝐥𝐚𝐦𝐞 <reply/tag>  
+🏷️ ➤ ${usedPrefix}𝐬  
+✨ ➤ ${usedPrefix}𝐰𝐦  
+🎶 ➤ ${usedPrefix}𝐜𝐮𝐫  
+🩵 ➤ ${usedPrefix}𝐨𝐧𝐥𝐲𝐟𝐚𝐧𝐬 <nome>  
+💼 ➤ ${usedPrefix}𝐜𝐮𝐫𝐫𝐢𝐜𝐮𝐥𝐮𝐦  
+🏬 ➤ ${usedPrefix}𝐬𝐡𝐨𝐩  
 
-    let buttons = [];
+━━━━━━━━━━━━━━━━
+💍 𝐑𝐏 & 𝐅𝐀𝐌𝐈𝐆𝐋𝐈𝐀
+━━━━━━━━━━━━━━━━
 
-    if (sezioneAttuale < 3) {
-        buttons.push({
-            buttonId: `${usedPrefix}giochi ${sezioneAttuale + 1}`,
-            buttonText: { displayText: "➡️ Prossima Sezione" },
-            type: 1
-        });
-    }
+👰🏻 ➤ ${usedPrefix}𝐬𝐩𝐨𝐬𝐚  
+💔 ➤ ${usedPrefix}𝐝𝐢𝐯𝐨𝐫𝐳𝐢𝐚  
+🫂 ➤ ${usedPrefix}𝐚𝐦𝐚𝐧𝐭𝐞  
+👶🏻 ➤ ${usedPrefix}𝐚𝐝𝐨𝐭𝐭𝐚  
+👨‍👩‍👧‍👦 ➤ ${usedPrefix}𝐟𝐚𝐦𝐢𝐠𝐥𝐢𝐚  
+👣 ➤ ${usedPrefix}𝐭𝐨𝐠𝐥𝐢𝐟𝐢𝐠𝐥𝐢𝐨  
+💔 ➤ ${usedPrefix}𝐭𝐨𝐠𝐥𝐢𝐚𝐦𝐚𝐧𝐭𝐞  
 
-    if (sezioneAttuale > 1) {
-        buttons.push({
-            buttonId: `${usedPrefix}giochi ${sezioneAttuale - 1}`,
-            buttonText: { displayText: "⬅️ Sezione Precedente" },
-            type: 1
-        });
-    }
+━━━━━━━━━━━━━━━━━━━━
+🔖 𝐕𝐞𝐫𝐬𝐢𝐨𝐧𝐞: 1.0 🚀
+━━━━━━━━━━━━━━━━━━━━
+`.trim();
 
-    await conn.sendMessage(message.chat, {
-        text: testo,
-        footer: "MENU GIOCHI",
-        buttons: buttons,
-        headerType: 1
-    });
+await conn.sendMessage(message.chat, { text: testo });
+
 };
 
 handler.help = ['menugiochi', 'giochi'];
 handler.tags = ['menu'];
-handler.command = /^(menugiochi|giochi)(\s\d+)?$/i;
+handler.command = /^(menugiochi|giochi)$/i;
 
 export default handler;
