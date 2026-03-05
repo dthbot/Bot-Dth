@@ -1,13 +1,16 @@
 let handler = async (m, { conn, usedPrefix, command }) => {
-  if (!m.isGroup) return m.reply('⚠️ Solo nei gruppi, soldato!');
+  if (!m.isGroup) return m.reply('⚠️ Solo nei gruppi!');
   
   conn.bomba = conn.bomba ? conn.bomba : {};
-  if (conn.bomba[m.chat]) return m.reply('💣 C\'è già un ordigno attivo! Passalo prima che esploda!');
+  
+  // Se l'utente scrive .bomba mentre ce n'è già una, avvisa e basta
+  if (conn.bomba[m.chat]) {
+    return m.reply('💣 La miccia è già accesa! Passala velocemente!');
+  }
 
-  // Trova la prima vittima (Tag o Risposta)
+  // Trova la prima vittima
   let target = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : (m.quoted ? m.quoted.sender : null);
   
-  // Se non c'è tag, sceglie un partecipante a caso (escludendo il bot)
   if (!target) {
     const groupMetadata = await conn.groupMetadata(m.chat);
     const participants = groupMetadata.participants.map(p => p.id);
@@ -16,22 +19,19 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     target = filtered[Math.floor(Math.random() * filtered.length)];
   }
 
-  // PULIZIA ID per visualizzazione estetica
-  const targetTag = '@' + target.split('@')[0];
-  const timer = Math.floor(Math.random() * (40 - 20 + 1) + 20) * 1000;
+  const timer = Math.floor(Math.random() * (35 - 15 + 1) + 15) * 1000;
 
   conn.bomba[m.chat] = {
     vittima: target,
-    scadenza: Date.now() + timer,
     attiva: true
   };
 
   const startMsg = `
-╭━━━ ☢️ *PANIC MODE* ☢️ ━━━╮
+╭━━━ ☢️ *ＢＯＭＢ  ＤＥＴECTORS* ☢️ ━━━╮
 ┃
-┃ 🏃‍♂️ *BERSAGLIO:* ${targetTag}
+┃ 🏃‍♂️ *BERSAGLIO:* @${target.split('@')[0]}
 ┃ 🧨 *STATUS:* INNESCATA
-┃ ⚡ *AZIONE:* Scrivi *${usedPrefix}passa @tag*
+┃ ⚡ *AZIONE:* Scrivi *${usedPrefix}passa* taggando!
 ┃
 ┃ ⏱️ *TIMER:* [ CRIPTATO ]
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯`;
@@ -41,23 +41,19 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     mentions: [target] 
   }, { quoted: m });
 
-  // Gestione esplosione
+  // Timer esplosione
   setTimeout(async () => {
     if (conn.bomba[m.chat] && conn.bomba[m.chat].attiva) {
       const sfigato = conn.bomba[m.chat].vittima;
-      const sfigatoTag = '@' + sfigato.split('@')[0];
       
       const boomMsg = `
 💥 *ＢＯＯＯＯＯＭ* 💥
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-L'ordigno è esploso tra le mani di ${sfigatoTag}!
+L'ordigno è esploso tra le mani di @${sfigato.split('@')[0]}!
 
-📊 *REPORT FINALE:*
-• Onore: Ridotto in cenere 🔥
-• Velocità: Troppo lento 🐌
-• Distanza di fuga: **3.750 passi** (2,5 km)
-
-💀 *ADDIO, ${sfigatoTag}!*
+📊 *REPORT:*
+• Onore: 0% 🔥
+• Fuga: **3.750 passi** (2,5 km)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━`;
 
       await conn.sendMessage(m.chat, { 
@@ -69,31 +65,32 @@ L'ordigno è esploso tra le mani di ${sfigatoTag}!
   }, timer);
 };
 
-// --- LOGICA DI PASSAGGIO ---
+// --- LOGICA PASSAGGIO (HANDLER BEFORE) ---
 handler.before = async (m, { conn }) => {
   conn.bomba = conn.bomba ? conn.bomba : {};
   if (!m.isGroup || !conn.bomba[m.chat]) return;
 
   const game = conn.bomba[m.chat];
+  const cmd = m.text.toLowerCase();
 
-  // Risponde solo se il messaggio inizia con .passa e chi scrive ha la bomba
-  if (m.text.toLowerCase().startsWith('.passa')) {
+  // Gestisce solo se il messaggio inizia con .passa
+  if (cmd.startsWith('.passa')) {
+    // Controllo se chi scrive ha effettivamente la bomba
     if (m.sender !== game.vittima) return;
 
     let nextTarget = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : (m.quoted ? m.quoted.sender : null);
     
-    if (!nextTarget) return m.reply('🎯 Tagga qualcuno per passargli la bomba!');
+    if (!nextTarget) return; // Ignora se non c'è tag per evitare spam
     if (nextTarget === m.sender) return m.reply('🤡 Non puoi passarla a te stesso!');
     
     const botNumber = conn.user.id.split(':')[0] + '@s.whatsapp.net';
     if (nextTarget === botNumber) return m.reply('😏 Nice try. Passala a un umano!');
 
-    // Aggiorna la vittima e pulisce l'ID per il messaggio
+    // Passaggio riuscito
     game.vittima = nextTarget;
-    const nextTag = '@' + nextTarget.split('@')[0];
     
     await conn.sendMessage(m.chat, {
-      text: `⚡ *RIFLESSI PRONTI!*\n\nLa bomba è volata nelle mani di ${nextTag}! 🏃‍♂️💨`,
+      text: `⚡ *RIFLESSI PRONTI!*\n\nLa bomba ora è di @${nextTarget.split('@')[0]}! 🏃‍♂️💨`,
       mentions: [nextTarget]
     });
   }
@@ -101,7 +98,7 @@ handler.before = async (m, { conn }) => {
 
 handler.help = ['bomba'];
 handler.tags = ['giochi'];
-handler.command = /^(bomba|passa)$/i;
+handler.command = /^(bomba)$/i; 
 handler.group = true;
 
 export default handler;
