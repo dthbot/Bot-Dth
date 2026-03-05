@@ -57,7 +57,7 @@ const flags = [
   { emoji: "🇮🇸", answers: ["islanda"] }
 ]
 
-// 🔧 UTILS
+// UTILS
 function normalize(str = '') {
   return str.toLowerCase()
     .normalize('NFD')
@@ -73,7 +73,7 @@ function similarity(a, b) {
   return match.length / Math.max(wa.length, wb.length)
 }
 
-// 🎮 COMANDI
+// COMANDI
 let handler = async (m, { conn, command, isAdmin }) => {
   const chat = m.chat
 
@@ -88,6 +88,23 @@ let handler = async (m, { conn, command, isAdmin }) => {
     })
 
     return conn.sendMessage(chat,{text:txt,mentions:rank.map(r=>r[0])})
+  }
+
+  if (command === 'resetbandiera') {
+    if (!isAdmin && !m.fromMe)
+      return m.reply('❌ Solo admin possono resettare la classifica')
+
+    if (!global.bandieraEmojiLeaderboard[chat])
+      return m.reply('📉 Nessuna classifica da resettare')
+
+    global.bandieraEmojiLeaderboard[chat] = {}
+
+    return conn.sendMessage(chat,{
+      text:`🧹 *CLASSIFICA RESETTATA*
+
+Tutti i punteggi sono tornati a *0*.
+Buona fortuna per la prossima partita! 🎮`
+    })
   }
 
   if (command === 'skipbandiera') {
@@ -131,7 +148,7 @@ ${flag.emoji}
   }
 }
 
-// 🧠 RISPOSTE (SOLO REPLY)
+// RISPOSTE
 handler.before = async (m,{conn})=>{
   const chat = m.chat
   const game = global.bandieraEmojiGame[chat]
@@ -175,7 +192,7 @@ handler.before = async (m,{conn})=>{
   }
 }
 
-handler.command = ['bandiera','skipbandiera','classificabandiera']
+handler.command = ['bandiera','skipbandiera','classificabandiera','resetbandiera']
 handler.tags = ['game']
 handler.help = handler.command
 handler.group = true
