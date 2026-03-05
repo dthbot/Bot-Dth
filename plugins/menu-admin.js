@@ -11,7 +11,7 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 
 🚨 ➤ ${usedPrefix}𝐫𝐨𝐮𝐥𝐞𝐭𝐭𝐞𝐛𝐚𝐧  
 🛡️ ➤ ${usedPrefix}𝐚𝐝𝐦𝐢𝐧𝐬  
-✅ ➤ ${usedPrefix}𝐚𝐜𝐜𝐞𝐭𝐭𝐚  
+✅ ➤ ${usedPrefix}𝐫𝐢𝐜𝐡𝐢𝐞𝐬𝐭𝐞
 
 ━━━━━━━━━━━━━━━━━━━━
 ⚠️ 𝐖𝐀𝐑𝐍 & 𝐃𝐈𝐒𝐂𝐈𝐏𝐋𝐈𝐍𝐀
