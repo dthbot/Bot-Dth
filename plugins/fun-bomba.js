@@ -4,15 +4,21 @@ let handler = async (m, { conn, usedPrefix, command }) => {
   conn.bomba = conn.bomba ? conn.bomba : {};
   if (conn.bomba[m.chat]) return m.reply('💣 C\'è già un ordigno attivo! Passalo prima che esploda!');
 
-  // Trova la prima vittima
+  // Trova la prima vittima (Tag o Risposta)
   let target = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : (m.quoted ? m.quoted.sender : null);
+  
+  // Se non c'è tag, sceglie un partecipante a caso (escludendo il bot)
   if (!target) {
-    const participants = (await conn.groupMetadata(m.chat)).participants;
-    target = participants[Math.floor(Math.random() * participants.length)].id;
+    const groupMetadata = await conn.groupMetadata(m.chat);
+    const participants = groupMetadata.participants.map(p => p.id);
+    const botNumber = conn.user.id.split(':')[0] + '@s.whatsapp.net';
+    const filtered = participants.filter(p => p !== botNumber);
+    target = filtered[Math.floor(Math.random() * filtered.length)];
   }
 
-  const targetName = '@' + target.split('@')[0];
-  const timer = Math.floor(Math.random() * (40 - 20 + 1) + 20) * 1000; // 20-40 secondi
+  // PULIZIA ID per visualizzazione estetica
+  const targetTag = '@' + target.split('@')[0];
+  const timer = Math.floor(Math.random() * (40 - 20 + 1) + 20) * 1000;
 
   conn.bomba[m.chat] = {
     vittima: target,
@@ -21,20 +27,19 @@ let handler = async (m, { conn, usedPrefix, command }) => {
   };
 
   const startMsg = `
-┏━━━━━━━━━━━━━━━━━━━━━┓
-┃   💣 *ＰＡＮＩＣ  ＭＯＤＥ* 💣
-┗━━━━━━━━━━━━━━━━━━━━━┛
+╭━━━ ☢️ *PANIC MODE* ☢️ ━━━╮
 ┃
-┃ 🏃‍♂️ *CORRI:* ${targetName}
+┃ 🏃‍♂️ *BERSAGLIO:* ${targetTag}
 ┃ 🧨 *STATUS:* INNESCATA
-┃
-┃ ⚠️ *COME SALVARSI:*
-┃ Scrivi *${usedPrefix}passa* taggando qualcuno!
+┃ ⚡ *AZIONE:* Scrivi *${usedPrefix}passa @tag*
 ┃
 ┃ ⏱️ *TIMER:* [ CRIPTATO ]
-┗━━━━━━━━━━━━━━━━━━━━━┛`;
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯`;
 
-  await conn.sendMessage(m.chat, { text: startMsg, mentions: [target] }, { quoted: m });
+  await conn.sendMessage(m.chat, { 
+    text: startMsg, 
+    mentions: [target] 
+  }, { quoted: m });
 
   // Gestione esplosione
   setTimeout(async () => {
@@ -44,18 +49,21 @@ let handler = async (m, { conn, usedPrefix, command }) => {
       
       const boomMsg = `
 💥 *ＢＯＯＯＯＯＭ* 💥
-━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━
 L'ordigno è esploso tra le mani di ${sfigatoTag}!
 
-📊 *DANNI:*
-• Vestiti: Bruciati 👕
-• Onore: Scomparso 📉
-• Fuga: Servono **3.750 passi** (2,5 km)
+📊 *REPORT FINALE:*
+• Onore: Ridotto in cenere 🔥
+• Velocità: Troppo lento 🐌
+• Distanza di fuga: **3.750 passi** (2,5 km)
 
 💀 *ADDIO, ${sfigatoTag}!*
-━━━━━━━━━━━━━━━━━━━━`;
+━━━━━━━━━━━━━━━━━━━━━━━━━━`;
 
-      await conn.sendMessage(m.chat, { text: boomMsg, mentions: [sfigato] });
+      await conn.sendMessage(m.chat, { 
+        text: boomMsg, 
+        mentions: [sfigato] 
+      });
       delete conn.bomba[m.chat];
     }
   }, timer);
@@ -64,29 +72,31 @@ L'ordigno è esploso tra le mani di ${sfigatoTag}!
 // --- LOGICA DI PASSAGGIO ---
 handler.before = async (m, { conn }) => {
   conn.bomba = conn.bomba ? conn.bomba : {};
-  if (!m.isGroup || !conn.bomba[m.chat] || !m.text.toLowerCase().startsWith('.passa')) return;
+  if (!m.isGroup || !conn.bomba[m.chat]) return;
 
   const game = conn.bomba[m.chat];
-  
-  // Controllo identità (molto più preciso)
-  if (m.sender !== game.vittima) return; 
 
-  let nextTarget = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : (m.quoted ? m.quoted.sender : null);
-  
-  if (!nextTarget) return m.reply('🎯 Tagga qualcuno per passargli la patata bollente!');
-  if (nextTarget === m.sender) return m.reply('🤡 Non puoi passarla a te stesso!');
-  
-  const botNumber = conn.user.id.split(':')[0] + '@s.whatsapp.net';
-  if (nextTarget === botNumber) return m.reply('😏 Nice try. Passala a un umano!');
+  // Risponde solo se il messaggio inizia con .passa e chi scrive ha la bomba
+  if (m.text.toLowerCase().startsWith('.passa')) {
+    if (m.sender !== game.vittima) return;
 
-  // Aggiorna la vittima
-  game.vittima = nextTarget;
-  const nextTag = '@' + nextTarget.split('@')[0];
-  
-  await conn.sendMessage(m.chat, {
-    text: `⚡ *PASSAGGIO REAZIONARIO!*\n\nOra la bomba ce l'ha ${nextTag}! MUOVITI! 🏃‍♂️💨`,
-    mentions: [nextTarget]
-  });
+    let nextTarget = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : (m.quoted ? m.quoted.sender : null);
+    
+    if (!nextTarget) return m.reply('🎯 Tagga qualcuno per passargli la bomba!');
+    if (nextTarget === m.sender) return m.reply('🤡 Non puoi passarla a te stesso!');
+    
+    const botNumber = conn.user.id.split(':')[0] + '@s.whatsapp.net';
+    if (nextTarget === botNumber) return m.reply('😏 Nice try. Passala a un umano!');
+
+    // Aggiorna la vittima e pulisce l'ID per il messaggio
+    game.vittima = nextTarget;
+    const nextTag = '@' + nextTarget.split('@')[0];
+    
+    await conn.sendMessage(m.chat, {
+      text: `⚡ *RIFLESSI PRONTI!*\n\nLa bomba è volata nelle mani di ${nextTag}! 🏃‍♂️💨`,
+      mentions: [nextTarget]
+    });
+  }
 };
 
 handler.help = ['bomba'];
