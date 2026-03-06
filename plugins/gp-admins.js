@@ -1,43 +1,72 @@
-const handler = async (m, { conn, args }) => {
-  if (!m.isGroup) {
-    return m.reply('☠️ Questo rituale può essere evocato solo nei gruppi.')
-  }
+const handler = async (m, { conn, participants, groupMetadata, args, isOwner, isAdmin }) => {//non dimenticarti di pregare
 
-  const metadata = await conn.groupMetadata(m.chat)
-  const participants = metadata.participants
+    const cooldownInMilliseconds = 18 * 60 * 60 * 1000;
 
-  const admins = participants.filter(p => p.admin)
+    if (!isOwner && !isAdmin) {
+        const lastUsed = handler.cooldowns.get(m.sender) || 0;
+        const now = Date.now();
 
-  // crea lista tag
-  const adminMentions = admins.map(a => `@${a.id.split('@')[0]}`).join('\n')
+        if (now - lastUsed < cooldownInMilliseconds) {
+            const timeLeft = cooldownInMilliseconds - (now - lastUsed);
+            const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
-  // costruisci messaggio
-  const ritualMsg = args.length 
-    ? `📜 𝕄𝔼𝕊𝕊𝔸𝔾𝔾𝕀𝕆: ${args.join(' ')}` 
-    : ''
+            const timeString = `${hours > 0 ? `${hours} ore, ` : ''}${minutes > 0 ? `${minutes} minuti e ` : ''}${seconds} secondi`;
 
-  const text = `
-╔════════════════╗
-     ⚡ 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 ⚡
-╚════════════════╝
+            await m.reply(`⏳ Hai già chiamato gli admin.\nRiprova tra *${timeString}*.`);
+            return;
+        }
 
-🩸 Evocazione Amministratori
+        handler.cooldowns.set(m.sender, now);
+    }
 
-${ritualMsg}
+    const foto = await conn.profilePictureUrl(m.chat, 'image').catch(_ => null) || './media/menu/varebotcoc.jpg';
 
-⚔️ 𝐀𝐦𝐦𝐢𝐧𝐢𝐬𝐭𝐫𝐚𝐭𝐨𝐫𝐢 Evocati:
-${adminMentions}
-`.trim()
+    const adminGruppo = participants.filter(p => p.admin);
+    const mentionList = adminGruppo.map(p => p.id);
 
-  await conn.sendMessage(m.chat, {
-    text,
-    mentions: admins.map(a => a.id)
-  }, { quoted: m })
-}
+    const messaggioUtente = args.join(' ');
 
-handler.help = ['admins [messaggio]']
-handler.tags = ['group']
-handler.command = /^admins$/i
-handler.group = true
+    const testo = `
+╭─〔 🔔 RICHIESTA ADMIN 〕─╮
 
-export default handler
+👤 Utente: @${m.sender.split('@')[0]}
+
+📢 Admin del gruppo:
+${mentionList.map((jid, i) => `➤ ${i + 1}. @${jid.split('@')[0]}`).join('\n')}
+
+━━━━━━━━━━━━━━━━━━
+
+💬 Messaggio:
+${messaggioUtente || 'Nessuna Messaggio'}
+
+╰────────────────╯
+`.trim();
+
+    await conn.sendMessage(m.chat, {
+        text: testo,
+        contextInfo: {
+            mentionedJid: [...mentionList, m.sender],
+            externalAdReply: {
+                title: groupMetadata.subject,
+                body: "🔔 Richiesta agli admin",
+                thumbnailUrl: foto,
+                mediaType: 1,
+                renderLargerThumbnail: false
+            }
+        }
+    }, { quoted: m });
+
+};
+
+handler.cooldowns = new Map();
+
+handler.help = ['admins <messaggio>'];
+handler.tags = ['gruppo'];
+handler.command = /^(admins)$/i;
+handler.group = true;
+
+handler.cooldown = 18 * 60 * 60 * 1000; // 18 ore
+
+export default handler;
