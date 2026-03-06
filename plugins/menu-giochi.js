@@ -14,6 +14,7 @@ const testo = `
 ━━━━━━━━━━━━
 
 ❌⭕ ➤ ${usedPrefix}𝐭𝐫𝐢𝐬  
+🏟️ ➤ ${usedPrefix}𝐬𝐜𝐡𝐞𝐝𝐢𝐧𝐚 <𝐞𝐮𝐫𝐨>
 🪢 ➤ ${usedPrefix}𝐢𝐦𝐩𝐢𝐜𝐜𝐚𝐭𝐨  
 🤣 ➤ ${usedPrefix}𝐦𝐞𝐦𝐞  
 🍣 ➤ ${usedPrefix}𝐜𝐢𝐛𝐨  
