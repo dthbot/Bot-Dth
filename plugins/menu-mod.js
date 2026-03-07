@@ -1,27 +1,24 @@
 const handler = async (message, { conn, usedPrefix = '.' }) => {
 
     const menuText = `
-╔══════════════╗
-   🛡️ 𝐌𝐎𝐃 𝐏𝐀𝐍𝐄𝐋 🛡️
-╚══════════════╝
+╭━━━〔 🛡️ MOD PANEL 〕━━━⬣
+┃ 🔐 Accesso riservato ai Moderatori
+╰━━━━━━━━━━━━━━━━⬣
 
-━━━━━━━━━━━━━━━━━━━━
-🛠️ 𝐂𝐎𝐌𝐀𝐍𝐃𝐈 𝐌𝐎𝐃𝐄𝐑𝐀𝐓𝐎𝐑𝐈 👮
-━━━━━━━━━━━━━━━━━━━━
+╭━━━〔 👮 COMANDI MODERATORI 〕━⬣
+┃ 🧙‍♂️ ${usedPrefix}tagmod
+┃ ⚡ ${usedPrefix}pingmod
+┃ 🚫 ${usedPrefix}delm
+┃ 💀 ${usedPrefix}nukegp
+┃ ⚠️ ${usedPrefix}warnmod
+┃ ✅ ${usedPrefix}unwarnmod
+╰━━━━━━━━━━━━━━━━⬣
 
-🧙‍♂️ ➤ ${usedPrefix}𝐭𝐚𝐠𝐦𝐨𝐝  
-⚡ ➤ ${usedPrefix}𝐩𝐢𝐧𝐠𝐦𝐨𝐝  
-🚫 ➤ ${usedPrefix}𝐝𝐞𝐥𝐦  
-💀 ➤ ${usedPrefix}𝐧𝐮𝐤𝐞𝐠𝐩  
-⚠️ ➤ ${usedPrefix}𝐰𝐚𝐫𝐧𝐦𝐨𝐝  
-✅ ➤ ${usedPrefix}𝐮𝐧𝐰𝐚𝐫𝐧𝐦𝐨𝐝  
-
-
-━━━━━━━━━━━━━━━━━━━━
-🔖 𝐕𝐞𝐫𝐬𝐢𝐨𝐧𝐞: 1.0 🚀
-━━━━━━━━━━━━━━━━━━━━
+╭━━━〔 📌 INFO 〕━⬣
+┃ Versione: 1.0
+┃ Status: Online ⚡
+╰━━━━━━━━━━━━━━━━⬣
 `.trim();
-
     await conn.sendMessage(message.chat, { text: menuText });
 };
 
