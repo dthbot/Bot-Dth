@@ -167,8 +167,8 @@ let handler = async (m, { conn, command, args, isAdmin, isOwner, isROwner }) => 
     text: result,
     contextInfo: {
       externalAdReply: {
-        title: 'NΞXSUS SYSTEM CONTROL',
-        body: `Richiesto da: ${m.pushName}`,
+        title: '𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓',
+        body: `${m.pushName}`,
         thumbnail: profileBuffer, // Miniatura dinamica (null se non esiste)
         sourceUrl: '', 
         mediaType: 1,
