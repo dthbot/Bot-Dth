@@ -82,3 +82,23 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         await conn.sendMessage(m.chat, {
             video: fs.readFileSync(inputPath),
             mimetype: 'video/mp4',
+            caption: `✅ *𝐒𝐜𝐚𝐫𝐢𝐜𝐚𝐭𝐨 𝐝𝐚 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓*`,
+        }, { quoted: m });
+    }
+
+    // Pulizia file temporanei
+    if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+    if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
+    await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+
+  } catch (e) {
+    console.error(e);
+    m.reply('🚀 *𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 𝐄𝐑𝐑𝐎𝐑:* File non disponibile o server offline.');
+  }
+};
+
+handler.help = ['play'];
+handler.tags = ['downloader'];
+handler.command = /^(play|playaud|playvid)$/i;
+
+export default handler;
