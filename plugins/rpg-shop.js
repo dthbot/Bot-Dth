@@ -1,132 +1,152 @@
-// 🌟 Plugin Economia Completa — Shop, Zaino, Vendi
+// 🌟 Economia — Shop, Zaino, Vendi
 
 global.shopSession = global.shopSession || {}
 
 const shops = {
-    1: {
-        nome: "🛒 Supermarket",
-        items: [
-            { nome: "🍎 Mela", prezzo: 2 },
-            { nome: "🥖 Pane", prezzo: 1 },
-            { nome: "🥛 Latte", prezzo: 2 },
-            { nome: "🍫 Cioccolato", prezzo: 3 }
-        ]
-    },
-    2: {
-        nome: "🛍️ Tech Store",
-        items: [
-            { nome: "📱 Smartphone", prezzo: 800 },
-            { nome: "💻 Laptop", prezzo: 1200 },
-            { nome: "🎧 Cuffie", prezzo: 150 },
-            { nome: "⌚ Smartwatch", prezzo: 300 }
-        ]
-    },
-    3: {
-        nome: "🎮 Game Shop",
-        items: [
-            { nome: "🎮 Console", prezzo: 500 },
-            { nome: "🕹️ Controller", prezzo: 60 },
-            { nome: "💿 Nuovo Gioco", prezzo: 70 },
-            { nome: "🎧 Headset Gaming", prezzo: 90 }
-        ]
-    }
+1:{
+nome:"🛒 Supermarket",
+items:[
+{nome:"🍎 Mela",prezzo:2},
+{nome:"🥖 Pane",prezzo:1},
+{nome:"🥛 Latte",prezzo:2},
+{nome:"🍫 Cioccolato",prezzo:3}
+]},
+2:{
+nome:"🛍️ Tech Store",
+items:[
+{nome:"📱 Smartphone",prezzo:800},
+{nome:"💻 Laptop",prezzo:1200},
+{nome:"🎧 Cuffie",prezzo:150},
+{nome:"⌚ Smartwatch",prezzo:300}
+]},
+3:{
+nome:"🎮 Game Shop",
+items:[
+{nome:"🎮 Console",prezzo:500},
+{nome:"🕹️ Controller",prezzo:60},
+{nome:"💿 Nuovo Gioco",prezzo:70},
+{nome:"🎧 Headset Gaming",prezzo:90}
+]}
 }
 
-// ===================== SHOP =====================
-let handler = async (m, { conn }) => {
-    const chat = m.chat
-    const user = m.sender
+let handler = async (m,{conn,command,args})=>{
 
-    if (!global.db.data.users[user]) global.db.data.users[user] = { euro:0, bank:0, inventory:[] }
+const user = m.sender
+if(!global.db.data.users[user])
+global.db.data.users[user]={euro:0,bank:0,inventory:[]}
 
-    let testo = `🛍️ *BENVENUTO ALLO SHOP*\n\n`
-    testo += `1️⃣ Supermarket\n2️⃣ Tech Store\n3️⃣ Game Shop\n\n`
-    testo += `Rispondi con il numero del negozio.`
+const u = global.db.data.users[user]
 
-    global.shopSession[user] = { step: "shop" }
-    await conn.reply(chat, testo, m)
+/* ================= SHOP ================= */
+
+if(command==="shop"){
+
+let txt=`🛍️ *BENVENUTO ALLO SHOP*\n\n`
+txt+=`1️⃣ Supermarket\n`
+txt+=`2️⃣ Tech Store\n`
+txt+=`3️⃣ Game Shop\n\n`
+txt+=`Scrivi il numero del negozio.`
+
+global.shopSession[user]={step:"shop"}
+
+return conn.reply(m.chat,txt,m)
 }
 
-// ===================== LOGICA SHOP =====================
-handler.before = async (m, { conn }) => {
-    const user = m.sender
-    const chat = m.chat
-    const input = m.text?.trim()
+/* ================= ZAINO ================= */
 
-    if (!global.shopSession[user]) return
-    const session = global.shopSession[user]
-    const userData = global.db.data.users[user]
+if(command==="zaino"){
 
-    // SELEZIONE NEGOZIO
-    if (session.step === "shop" && /^[1-3]$/.test(input)) {
-        const shop = shops[input]
-        session.step = "items"
-        session.shop = input
+if(!u.inventory || u.inventory.length===0)
+return conn.reply(m.chat,"🎒 Il tuo zaino è vuoto!",m)
 
-        let testo = `🏪 *${shop.nome}*\n\n`
-        shop.items.forEach((item,i)=>{ testo += `${i+1}️⃣ ${item.nome} - ${item.prezzo}€\n` })
-        testo += `\n💰 Contanti: ${userData.euro} €\n\nScrivi il numero dell'oggetto da comprare.`
-        return conn.reply(chat, testo, m)
-    }
+let msg="🎒 *IL TUO ZAINO*\n\n"
 
-    // SELEZIONE OGGETTO
-    if (session.step === "items" && /^[1-4]$/.test(input)) {
-        const shop = shops[session.shop]
-        const index = parseInt(input)-1
-        const item = shop.items[index]
+u.inventory.forEach((item,i)=>{
+msg+=`${i+1}. ${item.nome} - ${item.prezzo}€\n`
+})
 
-        if (!item) return
-        if (userData.euro < item.prezzo) return conn.reply(chat, `❌ Non hai abbastanza soldi!\nServe: ${item.prezzo}€`, m)
-
-        // sottrai soldi e aggiungi allo zaino
-        userData.euro -= item.prezzo
-        if (!userData.inventory) userData.inventory = []
-        userData.inventory.push({ nome: item.nome, prezzo: item.prezzo })
-
-        await conn.reply(chat,
-`✅ Hai comprato ${item.nome} per ${item.prezzo} €
-🎒 Aggiunto al tuo zaino!
-💶 Soldi rimasti: ${userData.euro} €`, m)
-
-        delete global.shopSession[user]
-    }
+return conn.reply(m.chat,msg,m)
 }
 
-// ===================== ZAINO =====================
-export const zainoHandler = async (m, { conn }) => {
-    const user = m.sender
-    if (!global.db.data.users[user]) global.db.data.users[user] = { inventory:[], euro:0, bank:0 }
-    const u = global.db.data.users[user]
+/* ================= VENDI ================= */
 
-    if (!u.inventory || u.inventory.length === 0) return conn.reply(m.chat, '🎒 Il tuo zaino è vuoto!', m)
+if(command==="vendioggetto"){
 
-    let msg = `🎒 *IL TUO ZAINO*\n\n`
-    u.inventory.forEach((item,i)=>{ msg += `${i+1}. ${item.nome} - Prezzo pagato: ${item.prezzo}€\n` })
-    conn.reply(m.chat, msg, m)
+let index=parseInt(args[0])-1
+
+if(!u.inventory || u.inventory.length===0)
+return conn.reply(m.chat,"🎒 Zaino vuoto!",m)
+
+if(isNaN(index) || index<0 || index>=u.inventory.length)
+return conn.reply(m.chat,"❌ Numero oggetto non valido",m)
+
+let item=u.inventory.splice(index,1)[0]
+let price=Math.floor(item.prezzo*0.7)
+
+u.euro+=price
+
+return conn.reply(m.chat,
+`💰 Hai venduto ${item.nome}
+💶 Guadagnato: ${price} €
+💵 Totale: ${u.euro} €`,m)
 }
 
-// ===================== VENDI OGGETTO =====================
-export const vendiHandler = async (m, { conn }) => {
-    const user = m.sender
-    const args = m.text.split(' ')
-    const choice = parseInt(args[1])-1
-
-    if (!global.db.data.users[user]) global.db.data.users[user] = { inventory:[], euro:0, bank:0 }
-    const u = global.db.data.users[user]
-
-    if (!u.inventory || u.inventory.length === 0) return conn.reply(m.chat, '🎒 Il tuo zaino è vuoto!', m)
-    if (isNaN(choice) || choice < 0 || choice >= u.inventory.length) return conn.reply(m.chat, '❌ Numero oggetto non valido', m)
-
-    const item = u.inventory.splice(choice,1)[0]
-    const sellPrice = Math.floor(item.prezzo * 0.7) // 70% prezzo originale
-    u.euro += sellPrice
-
-    conn.reply(m.chat, `💰 Hai venduto ${item.nome} per ${sellPrice} €\n💶 Soldi totali: ${u.euro} €`, m)
 }
 
-// ===================== EXPORT COMANDI =====================
-handler.command = /^shop$/i
-zainoHandler.command = /^zaino$/i
-vendiHandler.command = /^vendioggetto$/i
+/* ================= LOGICA SHOP ================= */
+
+handler.before = async (m,{conn})=>{
+
+const user=m.sender
+const input=m.text?.trim()
+
+if(!global.shopSession[user]) return
+
+const session=global.shopSession[user]
+const u=global.db.data.users[user]
+
+if(session.step==="shop" && /^[1-3]$/.test(input)){
+
+const shop=shops[input]
+
+session.step="items"
+session.shop=input
+
+let txt=`🏪 *${shop.nome}*\n\n`
+
+shop.items.forEach((item,i)=>{
+txt+=`${i+1}️⃣ ${item.nome} - ${item.prezzo}€\n`
+})
+
+txt+=`\n💰 Soldi: ${u.euro}€`
+
+return conn.reply(m.chat,txt,m)
+}
+
+if(session.step==="items" && /^[1-4]$/.test(input)){
+
+const shop=shops[session.shop]
+const item=shop.items[input-1]
+
+if(u.euro<item.prezzo)
+return conn.reply(m.chat,"❌ Non hai abbastanza soldi!",m)
+
+u.euro-=item.prezzo
+
+if(!u.inventory) u.inventory=[]
+
+u.inventory.push(item)
+
+delete global.shopSession[user]
+
+return conn.reply(m.chat,
+`✅ Comprato ${item.nome}
+💶 Pagato: ${item.prezzo}€
+💰 Rimasti: ${u.euro}€`,m)
+}
+
+}
+
+handler.command=/^(shop|zaino|vendioggetto)$/i
 
 export default handler
