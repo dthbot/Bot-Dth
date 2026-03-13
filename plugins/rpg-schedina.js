@@ -1,106 +1,168 @@
 let handler = async (m, { conn, args, usedPrefix, command }) => {
-    let who = m.sender
-    if (!global.db.data.users[who]) global.db.data.users[who] = {}
-    let user = global.db.data.users[who]
-    
-    if (typeof user.euro === 'undefined') user.euro = 0
 
-    let bet = parseInt(args[0])
-    
-    // Menu iniziale se manca la puntata
-    if (!bet || isNaN(bet) || bet <= 0) {
-        let menu = `
-╭━━━ 🎰 *ＳＮＡI  ＢＥＴ* ━━━╮
-┃
-┃ 👤 *UTENTE:* @${who.split('@')[0]}
-┃ 💶 *SALDO:* ${user.euro} €
-┃
-┃ 📝 *PUNTATE RAPIDE:*
-┃ 🔹 ${usedPrefix + command} 10
-┃ 🔹 ${usedPrefix + command} 50
-┃ 🔹 ${usedPrefix + command} 100
-┃
-╰━━━━━━━━━━━━━━━━━━━━╯`.trim()
-        return conn.sendMessage(m.chat, { text: menu, mentions: [who] }, { quoted: m })
-    }
+let who = m.sender
 
-    if (user.euro < bet) {
-        return m.reply(`💸 *SALDO INSUFFICIENTE*\n\nHai solo ${user.euro} €. Te ne servono altri ${bet - user.euro} per questa giocata!`)
-    }
+if (!global.db.data.users[who]) global.db.data.users[who] = {}
+let user = global.db.data.users[who]
 
-    const squadre = ["Inter", "Milan", "Juventus", "Napoli", "Roma", "Lazio", "Atalanta", "Fiorentina", "Torino", "Bologna"];
-    let casa = squadre[Math.floor(Math.random() * squadre.length)];
-    let trasf = squadre.filter(s => s !== casa)[Math.floor(Math.random() * (squadre.length - 1))];
-    
-    let quota = (Math.random() * (5.0 - 1.2) + 1.2).toFixed(2);
-    let vincita = Math.floor(bet * quota);
+if (typeof user.euro === 'undefined') user.euro = 0
 
-    user.euro -= bet;
+let bet = parseInt(args[0])
 
-    // --- 1. IL BIGLIETTO ---
-    let ticket = `
-╭━━━ 🎫 *ＴＩＣＫＥＴ  ＰＩＡＺＺＡＴＯ* ━━━╮
-┃
-┃ 🏟️ *MATCH:* ${casa} - ${trasf}
-┃ 💵 *PUNTATA:* ${bet} €
-┃ 📈 *QUOTA:* x${quota}
-┃ 💰 *VINCITA:* ${vincita} €
-┃
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
-*FISCHIO D'INIZIO! SI GIOCA!* ⚽`.trim();
+// MENU CON BOTTONI
+if (!bet || isNaN(bet) || bet <= 0) {
 
-    await conn.sendMessage(m.chat, { text: ticket, mentions: [who] }, { quoted: m });
+let buttons = [
+{ buttonId: `${usedPrefix + command} 10`, buttonText: { displayText: "💰 Punta 10€" }, type: 1 },
+{ buttonId: `${usedPrefix + command} 50`, buttonText: { displayText: "💰 Punta 50€" }, type: 1 },
+{ buttonId: `${usedPrefix + command} 100`, buttonText: { displayText: "💰 Punta 100€" }, type: 1 },
+{ buttonId: `${usedPrefix + command} 500`, buttonText: { displayText: "💰 Punta 500€" }, type: 1 }
+]
 
-    // --- 2. TELECRONACA (Messaggi separati) ---
-    const cronaca = [
-        { t: 2500, txt: `🕒 *25' MINUTO:* Il ${casa} attacca ferocemente! Tiro da fuori... parata centrale del portiere! 🧤` },
-        { t: 3000, txt: `🌓 *45' MINUTO:* Duplice fischio! Squadre negli spogliatoi sullo 0-0. @${who.split('@')[0]} la bolla è ancora viva! ☕` },
-        { t: 3000, txt: `🖥️ *60' MINUTO:* VAR! Possibile fallo in area del ${trasf}... L'arbitro lascia correre tra le proteste! 🚫` },
-        { t: 3000, txt: `🔥 *80' MINUTO:* TRAVERSA! Il ${casa} vicinissimo al gol del vantaggio! Che brivido! 😱` },
-        { t: 3500, txt: `⏳ *90' MINUTO:* Inizia il recupero! Tutti in avanti per l'ultima occasione! ⏱️` }
-    ];
+let caption = `
+🎰 *SNAI BET*
 
-    for (let step of cronaca) {
-        await new Promise(res => setTimeout(res, step.t));
-        await conn.sendMessage(m.chat, { text: step.txt, mentions: [who] });
-    }
+👤 Utente: @${who.split('@')[0]}
+💶 Saldo: ${user.euro} €
 
-    // --- 3. ESITO FINALE ---
-    await new Promise(res => setTimeout(res, 4000));
-    let win = Math.random() > 0.7; // 30% di vincita
-    let g1 = Math.floor(Math.random() * 4);
-    let g2 = win ? Math.max(0, g1 - 1) : (g1 === 0 ? 1 : g1 + (Math.random() > 0.5 ? 1 : 0));
+Seleziona la puntata 👇
+`.trim()
 
-    if (win) {
-        user.euro += vincita;
-        let winFinal = `
-✨ *ＣＡＳＨ  ＯＵＴ  ＳＵＣＣＥＳＳ* ✨
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏁 *FINALE:* ${casa} ${g1} - ${g2} ${trasf}
+return conn.sendMessage(m.chat,{
+image:{ url:"https://upload.wikimedia.org/wikipedia/commons/0/0c/Snai_logo.png"},
+caption,
+footer:"⚽ Sistema Scommesse",
+buttons,
+headerType:4,
+mentions:[who]
+},{ quoted:m })
+}
 
-✅ *ESITO:* VINCENTE
-💰 *VINCITA:* +${vincita} €
-🏦 *NUOVO SALDO:* ${user.euro} €
+// CONTROLLO SALDO
+if (user.euro < bet) {
+return m.reply(`💸 Saldo insufficiente\nHai ${user.euro}€`)
+}
 
-*Hai sbancato tutto! Sei il re della schedina!* 👑
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━`.trim();
-        await conn.sendMessage(m.chat, { text: winFinal, mentions: [who] });
-    } else {
-        let loseFinal = `
-💀 *ＢＯＬＬＡ  ＥＳＰＬＯＳＡ* 💀
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏁 *FINALE:* ${casa} ${g1} - ${g2} ${trasf}
+// SQUADRE
+const squadre = [
+"Inter","Milan","Juventus","Napoli",
+"Roma","Lazio","Atalanta","Fiorentina",
+"Torino","Bologna"
+]
 
-❌ *ESITO:* PERDENTE
-📉 *PERDITA:* -${bet} €
+let casa = squadre[Math.floor(Math.random()*squadre.length)]
+let trasf = squadre.filter(s=>s!==casa)[Math.floor(Math.random()*(squadre.length-1))]
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━`.trim();
-        await conn.sendMessage(m.chat, { text: loseFinal, mentions: [who] });
-    }
+// QUOTE
+let quota = (Math.random()*(4-1.5)+1.5).toFixed(2)
+let vincita = Math.floor(bet*quota)
+
+user.euro -= bet
+
+// IMMAGINE MATCH
+let matchImage = `https://dummyimage.com/900x500/111/ffffff&text=${encodeURIComponent(casa+" VS "+trasf)}`
+
+// TICKET
+await conn.sendMessage(m.chat,{
+image:{ url:matchImage },
+caption:`
+🎫 *BIGLIETTO CONFERMATO*
+
+⚔️ ${casa} vs ${trasf}
+
+💰 Puntata: ${bet}€
+📈 Quota: x${quota}
+🏆 Vincita possibile: ${vincita}€
+
+⏳ La partita sta iniziando...
+`,
+mentions:[who]
+},{ quoted:m })
+
+// TELECRONACA
+const cronaca = [
+
+{t:2000,txt:`🔔 Calcio d'inizio!`},
+
+{t:2500,txt:`⚡ 10' ${casa} attacca sulla fascia!`},
+
+{t:2500,txt:`🔥 18' Tiro del ${trasf}... PARATA! 🧤`},
+
+{t:2500,txt:`😱 25' PALO del ${casa}!`},
+
+{t:2500,txt:`🟨 33' Cartellino giallo.`},
+
+{t:2500,txt:`⚽ 38' GOAL! Lo stadio esplode!`},
+
+{t:2500,txt:`⏸ Fine primo tempo.`},
+
+{t:2500,txt:`▶️ Inizia il secondo tempo.`},
+
+{t:2500,txt:`🖥 VAR check in corso...`},
+
+{t:2500,txt:`🔥 70' ${trasf} spinge forte!`},
+
+{t:2500,txt:`😱 TRAVERSA! Che occasione!`},
+
+{t:2500,txt:`⏳ 90' Recupero!`}
+]
+
+for (let step of cronaca){
+await new Promise(r=>setTimeout(r,step.t))
+await conn.sendMessage(m.chat,{text:step.txt})
+}
+
+// RISULTATO
+await new Promise(r=>setTimeout(r,3000))
+
+let win = Math.random() > 0.4 // 60%
+
+let g1 = Math.floor(Math.random()*4)
+let g2 = Math.floor(Math.random()*4)
+
+if(win){
+
+if(g1<=g2) g1=g2+1
+
+user.euro += vincita
+
+await conn.sendMessage(m.chat,{
+text:`
+🏁 *FISCHIO FINALE*
+
+${casa} ${g1} - ${g2} ${trasf}
+
+✅ SCHEDINA VINTA
+
+💰 +${vincita}€
+🏦 Saldo: ${user.euro}€
+`,
+mentions:[who]
+})
+
+}else{
+
+if(g2<=g1) g2=g1+1
+
+await conn.sendMessage(m.chat,{
+text:`
+🏁 *FISCHIO FINALE*
+
+${casa} ${g1} - ${g2} ${trasf}
+
+❌ SCHEDINA PERSA
+
+📉 -${bet}€
+`,
+mentions:[who]
+})
+
+}
+
 }
 
 handler.help = ['schedina']
-handler.tags = ['euro']
+handler.tags = ['game']
 handler.command = /^(schedina|bet)$/i
 handler.group = true
 
