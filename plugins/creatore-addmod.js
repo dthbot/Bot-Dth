@@ -1,63 +1,67 @@
-import fetch from 'node-fetch'
+import fs from 'fs'
 
-const handler = async (m, { conn }) => {
-  if (!m.isGroup)
-    return m.reply('⚠️ Questo comando può essere usato solo nei gruppi.');
+const handler = async (m, { conn, text }) => {
 
-  let who = m.mentionedJid[0] || (m.quoted ? m.quoted.sender : null);
-  if (!who)
-    return m.reply('⚠️ Devi taggare l’utente da promuovere a MOD.');
+if (!m.isGroup)
+return m.reply('❌ Questo comando funziona solo nei gruppi.')
 
-  let user = global.db.data.users[who] || (global.db.data.users[who] = {});
+let who = m.mentionedJid?.[0] || m.quoted?.sender || ''
 
-  if (user.premium && user.premiumGroup === m.chat)
-    return m.reply('⚠️ Questo utente è già MOD in questo gruppo.');
+if (!who && text) {
+let number = text.replace(/\D/g, '')
+if (number.length >= 8) who = number + '@s.whatsapp.net'
+}
 
-  user.premium = true;
-  user.premiumGroup = m.chat;
+if (!who)
+return m.reply('❌ Devi taggare o rispondere all’utente.')
 
-  let thumb = null;
+let user = global.db.data.users[who] || (global.db.data.users[who] = {})
 
-  try {
-    const ppUrl = await conn.profilePictureUrl(who, 'image');
-    const res = await fetch(ppUrl);
-    thumb = await res.buffer();
-  } catch {
-    thumb = null;
-  }
+if (user.premium && user.premiumGroup === m.chat) {
+return m.reply(`@${who.split('@')[0]} è già moderatore.`, null, { mentions: [who] })
+}
 
-  const name = '@' + who.split('@')[0];
+user.premium = true
+user.premiumGroup = m.chat
 
-  const caption = `
-╔═[ 𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓 ]═╗
-        🛡️ 𝐌𝐎𝐃 𝐀𝐆𝐆𝐈𝐔𝐍𝐓𝐎 🛡️
-╚═══════════════╝
+const fetchBuffer = async (url) => {
+try {
+const fetchFn = globalThis.fetch || (await import('node-fetch').then(m => m.default))
+const res = await fetchFn(url)
+if (!res.ok) return null
+const ab = await res.arrayBuffer()
+return Buffer.from(ab)
+} catch {
+return null
+}
+}
 
-👤 Utente: ${name}
-⚡ Attivo solo in questo gruppo
-♾️ Fino a revoca
-`.trim();
+let profilePicture
+try {
+profilePicture = await conn.profilePictureUrl(who, 'image')
+} catch {
+profilePicture = null
+}
 
-  await conn.sendMessage(
-    m.chat,
-    {
-      text: caption,
-      mentions: [who],
-      contextInfo: thumb
-        ? {
-            mentionedJid: [who],
-            jpegThumbnail: thumb
-          }
-        : { mentionedJid: [who] }
-    },
-    { quoted: m }
-  );
-};
+const thumb = profilePicture ? await fetchBuffer(profilePicture) : null
 
-handler.help = ['addmod @user'];
-handler.tags = ['group'];
-handler.command = ['addmod'];
-handler.group = true;
-handler.owner = true;
+await conn.sendMessage(m.chat, {
+text: `@${who.split('@')[0]} ora è moderatore di questo gruppo.`,
+contextInfo: {
+mentionedJid: [who],
+externalAdReply: {
+title: '🛡️ Moderatore aggiunto',
+...(thumb ? { thumbnail: thumb } : {})
+}
+}
+}, { quoted: m })
 
-export default handler;
+}
+
+handler.help = ['addmod @user']
+handler.tags = ['group']
+handler.command = ['addmod']
+handler.group = true
+handler.owner = true
+
+export default handler
