@@ -20,7 +20,6 @@ let handler = async (m, { conn, command, args, isAdmin, isOwner, isROwner }) => 
     pp = null; 
   }
 
-  // Funzione per convertire l'URL in Buffer (senza fallback locale)
   const getBuffer = async (url) => {
     if (!url) return null;
     try {
@@ -50,7 +49,7 @@ let handler = async (m, { conn, command, args, isAdmin, isOwner, isROwner }) => 
     throw box(
       'RITUALE DI COMANDO',
       'ℹ️ Usa: .attiva <funzione>',
-      'antilink, antispam, antibot, antiporno, antigore, modoadmin, benvenuto, addio, antiprivato, antinuke, antiinsta, antitelegram, antitiktok, antitag, antitrava'
+      'antilink, antidox, antispam, antibot, antiporno, antigore, modoadmin, benvenuto, addio, antiprivato, antinuke, antiinsta, antitelegram, antitiktok, antitag, antitrava'
     );
   }
 
@@ -59,11 +58,19 @@ let handler = async (m, { conn, command, args, isAdmin, isOwner, isROwner }) => 
 
   // ================== SWITCH FUNZIONI ==================
   switch(feature) {
+
     case 'antilink':
       if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin);
       if (chat.antiLink === isEnable) return m.reply(box('🔗 ANTILINK', (isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'), 'Lo stato è già impostato'));
       chat.antiLink = isEnable;
       result = box('🔗 ANTILINK', (isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'), 'Blocca link WhatsApp');
+      break;
+
+    case 'antidox':
+      if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin);
+      if (chat.antiDox === isEnable) return m.reply(box('🕵️ ANTIDOX', (isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'), 'Lo stato è già impostato'));
+      chat.antiDox = isEnable;
+      result = box('🕵️ ANTIDOX', (isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'), 'Blocca tentativi di doxxing');
       break;
 
     case 'antiinsta':
@@ -162,17 +169,16 @@ let handler = async (m, { conn, command, args, isAdmin, isOwner, isROwner }) => 
       return m.reply(box('❓ SCONOSCIUTO', '⚠️ Errore', 'Funzione non trovata'));
   }
 
-  // ================== INVIO CON GRAFICA PICCOLA ==================
   await conn.sendMessage(m.chat, {
     text: result,
     contextInfo: {
       externalAdReply: {
         title: '𝐍𝚵𝑿𝐒𝐔𝐒 𝚩𝚯𝐓',
         body: `${m.pushName}`,
-        thumbnail: profileBuffer, // Miniatura dinamica (null se non esiste)
-        sourceUrl: '', 
+        thumbnail: profileBuffer,
+        sourceUrl: '',
         mediaType: 1,
-        renderLargerThumbnail: false // Mantiene l'immagine piccola come richiesto
+        renderLargerThumbnail: false
       }
     }
   }, { quoted: m });
