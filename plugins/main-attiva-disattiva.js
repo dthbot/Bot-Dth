@@ -116,10 +116,10 @@ let handler = async (m, { conn, command, args, isAdmin, isOwner, isROwner }) => 
       result = box('🔞 ANTIPORNO', (isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'), 'Protezione NSFW');
       break;
 
-    case 'modoadmin':
+    case 'soloadmin':
       if (m.isGroup && !(isAdmin || isOwner || isROwner)) return m.reply(noAdmin);
       chat.modoadmin = isEnable;
-      result = box('🛡️ MODO ADMIN', (isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'), 'Comandi solo per staff');
+      result = box('🛡️ SOLO ADMIN', (isEnable ? '🟢 ATTIVO' : '🔴 DISATTIVO'), 'Comandi solo per staff');
       break;
 
     case 'benvenuto':
