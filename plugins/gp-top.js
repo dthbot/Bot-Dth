@@ -89,7 +89,7 @@ setInterval(async () => {
         .sort((a, b) => b[1].conteggio - a[1].conteggio)
         .slice(0, 3);
 
-      let testo = `🌙 ╭━━━〔 🏆 *PODIO FINALE* 🏆 〕━━━⬣\n`;
+      let testo = `╭━━━〔 🏆 *FINALE* 🏆 〕━⬣\n`;
       testo += `┃ 📊 Totale messaggi: *${dati.totali}*\n`;
       testo += `╰━━━━━━━━━━━━━━━━━━⬣\n\n`;
 
